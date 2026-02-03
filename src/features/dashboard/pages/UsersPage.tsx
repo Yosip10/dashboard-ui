@@ -1,0 +1,197 @@
+import { useState } from "react";
+import { Eye, Pencil, Trash2, Plus, X, Loader2 } from "lucide-react";
+import { CardContent, CardHeader, CardTitle } from "@/shared/ui/card";
+import { Button } from "@/shared/ui/button";
+import { Badge } from "@/shared/ui/badge";
+import { Switch } from "@/shared/ui/switch";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/shared/ui/table";
+import { UserModal } from "../components/user-modal";
+import { UserDetailsModal } from "../components/user-details-modal";
+import { CreateUserModal } from "../components/create-user-modal";
+import { useUsers } from "../hooks/use-users";
+
+export function UsersPage() {
+  const { data: response, isLoading, isError } = useUsers();
+  const [modalOpen, setModalOpen] = useState(false);
+  const [detailsOpen, setDetailsOpen] = useState(false);
+  const [createModalOpen, setCreateModalOpen] = useState(false);
+  const [selectedUser, setSelectedUser] = useState<any>(null);
+
+  const usersData = response?.data?.users || [];
+
+  const handleEdit = (user: any) => {
+    setSelectedUser(user);
+    setModalOpen(true);
+  };
+
+  const handleView = (user: any) => {
+    setSelectedUser(user);
+    setDetailsOpen(true);
+  };
+
+  const handleNew = () => {
+    setCreateModalOpen(true);
+  };
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+        <span className="ml-2 text-muted-foreground">Cargando usuarios...</span>
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <div className="flex items-center justify-center h-64 text-red-500">
+        <X className="w-8 h-8 mr-2" />
+        <span>Error al cargar los usuarios.</span>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      <UserModal
+        open={modalOpen}
+        onOpenChange={setModalOpen}
+        user={selectedUser}
+      />
+
+      <UserDetailsModal
+        open={detailsOpen}
+        onOpenChange={setDetailsOpen}
+        user={selectedUser}
+      />
+
+      <CreateUserModal
+        open={createModalOpen}
+        onOpenChange={setCreateModalOpen}
+      />
+
+
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-semibold text-foreground">Usuarios</h1>
+          <p className="text-muted-foreground mt-1">
+            Gestiona los usuarios del sistema
+          </p>
+        </div>
+        <Button
+          onClick={handleNew}
+          className="bg-primary hover:bg-primary/80 shadow-lg shadow-primary/25 transition-all duration-200"
+        >
+          <Plus className="w-4 h-4 mr-2" />
+          Nuevo Usuario
+        </Button>
+      </div>
+
+
+      {/* Table */}
+      <div className="overflow-hidden rounded-xs">
+        <CardHeader className="py-3 bg-muted-foreground/5 rounded mt-2 rounded-t-lg border-t-1 border-l-1 border-r-1 border-gray-200">
+          <CardTitle className="text-xl">Lista de Usuarios</CardTitle>
+        </CardHeader>
+        <CardContent className="p-0 border-1 border-gray-200">
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow className="hover:bg-transparent border-gray-200">
+                  <TableHead className="font-semibold pl-5">Código</TableHead>
+                  <TableHead className="font-semibold">Usuario</TableHead>
+                  <TableHead className="font-semibold">Email</TableHead>
+                  <TableHead className="font-semibold">Rol</TableHead>
+                  <TableHead className="font-semibold">Activo</TableHead>
+                  <TableHead className="font-semibold text-right">
+                    Acciones
+                  </TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {usersData.map((user) => (
+                  <TableRow
+                    key={user.id}
+                    className="hover:bg-primary/5 transition-colors duration-150 border-gray-200"
+                  >
+                    <TableCell className="text-xs text-muted-foreground max-w-[100px] truncate pl-5">
+                      {user.username}
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex flex-col">
+                        <span className="font-medium">{user.firstName} {user.lastName}</span>
+                        <span className="text-xs text-muted-foreground">{user.email}</span>
+                      </div>
+                    </TableCell>
+                    <TableCell className="text-sm">
+                      {user.email}
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex flex-wrap gap-1">
+                        {user.roles && user.roles.length > 0 ? (
+                          user.roles.map((role: any) => (
+                            <Badge
+                              key={role.id}
+                              variant="secondary"
+                              className="bg-primary/10 text-primary hover:bg-primary/20 whitespace-nowrap"
+                            >
+                              {role.name.replace("ROLE-", "")}
+                            </Badge>
+                          ))
+                        ) : (
+                          <span className="text-muted-foreground text-xs">Sin rol</span>
+                        )}
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <Switch
+                        checked={user.enabled}
+                        disabled
+                        className="data-[state=checked]:bg-primary"
+                      />
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <div className="flex items-center justify-end gap-1">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8 hover:bg-primary/10 hover:text-primary"
+                          onClick={() => handleView(user)}
+                        >
+                          <Eye className="w-4 h-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8 hover:bg-primary/10 hover:text-primary"
+                          onClick={() => handleEdit(user)}
+                        >
+                          <Pencil className="w-4 h-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8 hover:bg-red-500/10 hover:text-red-600"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+        </CardContent>
+      </div>
+    </div>
+  );
+}

@@ -72,13 +72,10 @@ export const fetchTenantConfig = async (
     tenantId: string
 ): Promise<TenantConfig> => {
     return new Promise((resolve, reject) => {
-        console.log(`[TenantService] Fetching config for: ${tenantId}...`);
-
         // Simulate network delay
         setTimeout(() => {
             const config = MOCK_TENANTS[tenantId];
             if (config) {
-                console.log(`[TenantService] Config found for: ${tenantId}`);
                 resolve(config);
             } else {
                 console.error(`[TenantService] Config NOT found for: ${tenantId}`);

@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import type { AuthState, User } from "../types/auth";
+import { logoutService } from "../api/auth.service";
 
 
 interface AuthStore extends AuthState {
@@ -30,13 +31,16 @@ export const useAuthStore = create<AuthStore>()(
                 })
             },
 
-
             setLoading: (isLoading) => set({ isLoading }),
 
             logout: () => {
-                set({ user: null, isAuthenticated: false, error: null });
-                localStorage.removeItem("remember");
-                localStorage.removeItem("current_tenant_config");
+                const user = useAuthStore.getState().user;
+                if (user) {
+                    logoutService(user.accountId, user.refresh_token);
+                    set({ user: null, isAuthenticated: false, error: null });
+                    localStorage.removeItem("remember");
+                    localStorage.removeItem("current_tenant_config");
+                }
             },
         }),
         {

@@ -8,10 +8,12 @@ import { Label } from "@/shared/ui/label";
 import { Checkbox } from "@/shared/ui/checkbox";
 import { useLoginMutation } from "../hooks/use-login";
 import { toast } from "sonner";
+import { useTenant } from "@/shared/context/TenantContext";
 
 export function LoginView() {
     const loginMutation = useLoginMutation();
     const [showPassword, setShowPassword] = useState(false);
+    const { tenantConfig } = useTenant()
     const isPending = loginMutation.isPending;
     const [formData, setFormData] = useState({
         accountId: "",
@@ -20,7 +22,7 @@ export function LoginView() {
         rememberMe: false,
     });
 
-
+    console.log(tenantConfig)
     useEffect(() => {
         const remembered = localStorage.getItem("remember");
         if (remembered) {
@@ -102,13 +104,11 @@ export function LoginView() {
             <div className="w-full max-w-md relative z-10">
                 {/* Logo */}
                 <div className="text-center mb-8">
-                    <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-primary shadow-xl shadow-primary/30 mb-4">
-                        <img src="/images/logo-ado.png" alt="Logo" width={40} height={40} />
-                    </div>
+                    <img src={tenantConfig?.logo} alt="Logo" width={100} height={100} className="mb-4 m-auto" />
                     <h1 className="text-2xl font-bold text-foreground">
                         Bienvenidos
                     </h1>
-                    <p className="text-muted-foreground mt-1">Plataforma de gestión de entidades, identidad y
+                    <p className="text-foreground mt-1">Plataforma de gestión de entidades, identidad y
                         cumplimiento de última generación</p>
                 </div>
 
@@ -131,7 +131,7 @@ export function LoginView() {
                                         onChange={(e) =>
                                             setFormData({ ...formData, accountId: e.target.value })
                                         }
-                                        className="pl-11 h-12 bg-muted/50 border-transparent focus:border-blue-500 focus:bg-background transition-all duration-200"
+                                        className="pl-11 h-12 bg-muted/50 border-transparent focus:border-primary focus:bg-background transition-all duration-200"
                                         required
                                     />
                                 </div>
@@ -152,7 +152,7 @@ export function LoginView() {
                                         onChange={(e) =>
                                             setFormData({ ...formData, username: e.target.value })
                                         }
-                                        className="pl-11 h-12 bg-muted/50 border-transparent focus:border-blue-500 focus:bg-background transition-all duration-200"
+                                        className="pl-11 h-12 bg-muted/50 border-transparent focus:border-primary focus:bg-background transition-all duration-200"
                                         required
                                     />
                                 </div>
@@ -173,7 +173,7 @@ export function LoginView() {
                                         onChange={(e) =>
                                             setFormData({ ...formData, password: e.target.value })
                                         }
-                                        className="pl-11 pr-11 h-12 bg-muted/50 border-transparent focus:border-blue-500 focus:bg-background transition-all duration-200"
+                                        className="pl-11 pr-11 h-12 bg-muted/50 border-transparent focus:border-primary focus:bg-background transition-all duration-200"
                                         required
                                     />
                                     <button

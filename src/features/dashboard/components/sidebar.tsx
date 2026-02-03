@@ -38,7 +38,6 @@ export function Sidebar({ activeView, onViewChange }: SidebarProps) {
             {/* Logo */}
             <div className="p-[17.5px] border-b border-gray-200 h-16">
                 <div className="flex items-center gap-3">
-                    <img src={context?.tenantConfig?.logo} alt="Logo" className="w-10 h-10 object-contain" />
                     <span className="font-semibold text-xl text-foreground">
                         {context?.tenantConfig?.name}
                     </span>

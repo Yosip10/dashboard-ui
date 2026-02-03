@@ -17,7 +17,7 @@ export const useUsers = (params: ListUsersPayload = {}) => {
 
                 // Handle token expired in successful response body
                 if (data.code === "TOKEN_EXPIRED" || data.statusCode === "40001") {
-                    logout();
+                    //logout();
                     throw new Error("TOKEN_EXPIRED");
                 }
 
@@ -26,7 +26,7 @@ export const useUsers = (params: ListUsersPayload = {}) => {
                 // Handle token expired in axios error response
                 const errorData = error.response?.data;
                 if (errorData?.code === "TOKEN_EXPIRED" || errorData?.statusCode === "40001") {
-                    logout();
+                    //logout();
                     toast.error("Sesión expirada");
                 }
                 throw error;

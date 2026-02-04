@@ -3,7 +3,7 @@ import { signinService, getUserAllInfoService } from "../api/auth.service";
 import { useAuthStore } from "../store/auth.store";
 import { handleRoleModule, handleRoleName, parseUserAttributes } from "../utils/auth.helpers";
 import { toast } from "sonner";
-import { useNavigate } from "react-router";
+import { useNavigate, useParams } from "react-router";
 
 interface LoginParams {
     username: string;
@@ -15,6 +15,8 @@ interface LoginParams {
 export const useLoginMutation = () => {
     const { setUser } = useAuthStore();
     let navigate = useNavigate();
+    const { tenant } = useParams();
+
     return useMutation({
         mutationFn: async ({ username, password, accountId, rememberMe }: LoginParams) => {
             const bodyLogin = { username, password };
@@ -59,9 +61,7 @@ export const useLoginMutation = () => {
             });
 
             toast.success("Login exitoso.");
-
-            const searchParams = new URLSearchParams(window.location.search);
-            navigate(`/?${searchParams.toString()}`);
+            navigate(`/${tenant}`);
         },
         onError: (error: any) => {
             console.error("Login Error:", error);

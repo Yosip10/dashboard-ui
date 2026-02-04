@@ -17,7 +17,7 @@ const router = createBrowserRouter([
                 element: <ProtectedRoute />,
                 children: [
                     {
-                        path: "/",
+                        path: "/:tenant",
                         element: <DashboardPage />,
                     },
                 ],
@@ -26,7 +26,7 @@ const router = createBrowserRouter([
                 element: <PublicRoute />,
                 children: [
                     {
-                        path: "/login",
+                        path: "login/:tenant",
                         element: <LoginView />,
                     },
                 ],

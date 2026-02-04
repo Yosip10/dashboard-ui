@@ -6,7 +6,8 @@ export const PublicRoute = () => {
     const location = useLocation();
 
     if (isAuthenticated) {
-        return <Navigate to={`/${location.search}`} replace />;
+        const tenant = location.pathname.split('/')[2]; // /login/tenant -> tenant
+        return <Navigate to={`/${tenant || ''}`} replace />;
     }
 
     return <Outlet />;

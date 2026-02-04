@@ -6,7 +6,8 @@ export const ProtectedRoute = () => {
     const location = useLocation();
 
     if (!isAuthenticated) {
-        return <Navigate to={`/login${location.search}`} state={{ from: location }} replace />;
+        const tenant = location.pathname.split('/')[1];
+        return <Navigate to={`/login/${tenant || ''}`} state={{ from: location }} replace />;
     }
 
     return <Outlet />;

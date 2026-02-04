@@ -3,17 +3,17 @@
 
 @font-face {
   font-family: 'Space Grotesk-regular';
-  src: url('./fonts/SpaceGrotesk-Regular.ttf');
+  src: url('/fonts/SpaceGrotesk-Regular.ttf');
 }
 
 @font-face {
   font-family: 'Space Grotesk-bold';
-  src: url('./fonts/SpaceGrotesk-Bold.ttf');
+  src: url('/fonts/SpaceGrotesk-Bold.ttf');
 }
 
 @font-face {
   font-family: 'Space Grotesk-medium';
-  src: url('./fonts/SpaceGrotesk-Medium.ttf');
+  src: url('/fonts/SpaceGrotesk-Medium.ttf');
 }
 
 * {

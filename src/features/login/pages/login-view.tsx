@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from "react";
-import { Eye, EyeOff, Lock, User, Building2 } from "lucide-react";
+import { Eye, EyeOff, Lock, User } from "lucide-react";
 import { Card, CardContent } from "@/shared/ui/card";
 import { Button } from "@/shared/ui/button";
 import { Input } from "@/shared/ui/input";
@@ -16,7 +16,7 @@ export function LoginView() {
     const { tenantConfig } = useTenant()
     const isPending = loginMutation.isPending;
     const [formData, setFormData] = useState({
-        accountId: "",
+        accountId: "TuyaQA",
         username: "",
         password: "",
         rememberMe: false,
@@ -116,27 +116,6 @@ export function LoginView() {
                 <Card className="border-3 border-gray-100 shadow-2xl shadow-slate-200/50 backdrop-blur-sm bg-background/80">
                     <CardContent className="p-8">
                         <form onSubmit={handleSubmit} className="space-y-5">
-                            {/* Id Cuenta */}
-                            <div className="space-y-2">
-                                <Label htmlFor="accountId" className="text-sm font-medium">
-                                    ID Cuenta
-                                </Label>
-                                <div className="relative">
-                                    <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-                                    <Input
-                                        id="accountId"
-                                        type="text"
-                                        placeholder="Ingrese su ID de cuenta"
-                                        value={formData.accountId}
-                                        onChange={(e) =>
-                                            setFormData({ ...formData, accountId: e.target.value })
-                                        }
-                                        className="pl-11 h-12 bg-muted/50 border-transparent focus:border-primary focus:bg-background transition-all duration-200"
-                                        required
-                                    />
-                                </div>
-                            </div>
-
                             {/* Usuario */}
                             <div className="space-y-2">
                                 <Label htmlFor="username" className="text-sm font-medium">

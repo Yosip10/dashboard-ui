@@ -1,13 +1,13 @@
 import { useEffect, useState } from "react";
 import { useAuthStore } from "@/features/login/store/auth.store";
-import { Navigate, Outlet, useSearchParams } from "react-router";
+import { Navigate, Outlet, useParams } from "react-router";
 import { fetchTenantConfig, type TenantConfig } from "@/shared/services/tenant.service";
 import { TenantContext } from "@/shared/context/TenantContext";
 import { Loader } from "@/shared/components/loader";
 
 export const TenantGuard = () => {
-    const [searchParams] = useSearchParams();
-    const tenantId = searchParams.get("tenant");
+    const { tenant } = useParams();
+    const tenantId = tenant;
     const [currentTenant, setCurrentTenant] = useState<TenantConfig | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<"not_found" | "failed" | null>(null);
@@ -30,9 +30,8 @@ export const TenantGuard = () => {
 
                     if (cachedConfigStr) {
                         const cachedConfig = JSON.parse(cachedConfigStr) as TenantConfig;
-
                         // Si la configuración en caché coincide con el inquilino solicitado -> Usarla
-                        if (cachedConfig.id === tenantId) {
+                        if (cachedConfig.id.toLowerCase() === tenantId.toLowerCase()) {
                             setCurrentTenant(cachedConfig);
                             setLoading(false);
                             return;
@@ -41,9 +40,8 @@ export const TenantGuard = () => {
                         logout();
                     }
 
-
                     // 3. Obtener de API (Mock)
-                    const config = await fetchTenantConfig(tenantId);
+                    const config = await fetchTenantConfig(tenantId.toLowerCase());
                     // 4. Guardar en LocalStorage (Sobrescribir existente)
                     localStorage.setItem(storageKey, JSON.stringify(config));
                     setCurrentTenant(config);
@@ -61,7 +59,6 @@ export const TenantGuard = () => {
 
         loadTenant();
     }, [tenantId, logout]);
-
 
     useEffect(() => {
         if (!currentTenant) return;

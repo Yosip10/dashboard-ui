@@ -64,7 +64,7 @@ export function RoleModal({ open, onOpenChange, role }: RoleModalProps) {
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
               placeholder="Ingrese el nombre del rol"
-              className="h-11 bg-muted/50 border-transparent focus:border-blue-500"
+              className="h-11 bg-muted/50 border-transparent focus:border-primary"
               required
             />
           </div>
@@ -78,7 +78,7 @@ export function RoleModal({ open, onOpenChange, role }: RoleModalProps) {
                     id={module}
                     checked={formData.modules.includes(module)}
                     onCheckedChange={() => toggleModule(module)}
-                    className="data-[state=checked]:bg-blue-500 data-[state=checked]:border-blue-500"
+                    className="data-[state=checked]:bg-primary data-[state=checked]:border-primary"
                   />
                   <Label htmlFor={module} className="text-sm cursor-pointer">
                     {module}
@@ -94,7 +94,7 @@ export function RoleModal({ open, onOpenChange, role }: RoleModalProps) {
               id="active"
               checked={formData.active}
               onCheckedChange={(checked) => setFormData({ ...formData, active: checked })}
-              className="data-[state=checked]:bg-blue-500"
+              className="data-[state=checked]:bg-primary"
             />
           </div>
 

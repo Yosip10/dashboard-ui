@@ -29,7 +29,8 @@ export function Sidebar({ activeView, onViewChange }: SidebarProps) {
 
     const handleLogout = () => {
         logout();
-        navigate("/login");
+        const tenantId = context?.tenantConfig?.id;
+        navigate(`/login/${tenantId || ''}`);
     };
 
 

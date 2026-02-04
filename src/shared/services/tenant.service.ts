@@ -16,7 +16,7 @@ export interface TenantConfig {
 }
 
 const MOCK_TENANTS: Record<string, TenantConfig> = {
-    companyA: {
+    companya: {
         id: "companyA",
         name: "Banco BBVA",
         displayName: "Banco BBVA",
@@ -34,7 +34,7 @@ const MOCK_TENANTS: Record<string, TenantConfig> = {
         },
         logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/05/BBVA_2019.svg/1280px-BBVA_2019.svg.png"
     },
-    companyB: {
+    companyb: {
         id: "companyB",
         name: "Banco Bogota",
         displayName: "Banco Bogota",
@@ -50,7 +50,7 @@ const MOCK_TENANTS: Record<string, TenantConfig> = {
         },
         logo: "https://yt3.googleusercontent.com/NHLfZYbkHdBQSLrkeIarQ1NwKs4hqJ44t9lFut7k7JsMtxVmlKwVM06El423HHaHcCDsaP5m=s900-c-k-c0x00ffffff-no-rj",
     },
-    companyC: {
+    companyc: {
         id: "companyC",
         name: "Falabella",
         displayName: "Falabella",

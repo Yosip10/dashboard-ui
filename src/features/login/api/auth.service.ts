@@ -29,11 +29,32 @@ export const logoutService = (accountId: string, refresh_token: string) => {
     );
 }; */
 
-export const refreshService = (refreshToken: string, accountId: string) => {
-    const headers = { "x-accountId": accountId };
-    return apiClient.post<LoginResponse>(`${apiUrl}/auth/refresh-token`, { refreshToken }, {
-        headers,
+export const refreshService = async (refreshToken: string) => {
+    const url = "https://apigw-v2-dev.ado-tech.com/auth/realms/TuyaQA/protocol/openid-connect/token";
+    const params = new URLSearchParams();
+    params.append("grant_type", "refresh_token");
+    params.append("client_id", "sign-in-scope");
+    params.append("refresh_token", refreshToken);
+
+    const { data } = await apiClient.post(url, params, {
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+        },
     });
+
+    // Map snake_case to camelCase for the application LoginResponse
+    return {
+        data: {
+            accessToken: data.access_token,
+            refreshToken: data.refresh_token,
+            tokenType: data.token_type,
+            expiresIn: data.expires_in,
+            scope: data.scope,
+            issuedAt: String(Date.now()), // Or some other representation if not in response
+            expiresAt: String(Date.now() + (data.expires_in * 1000)),
+            refreshExpiresIn: data.refresh_expires_in,
+        } as LoginResponse
+    };
 };
 /**
  * Simula el servicio getUserAllInfoService

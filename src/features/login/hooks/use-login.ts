@@ -12,7 +12,11 @@ interface LoginParams {
     rememberMe: boolean;
 }
 
-export const useLoginMutation = () => {
+interface LoginOptions {
+    redirect?: boolean;
+}
+
+export const useLoginMutation = (options: LoginOptions = { redirect: true }) => {
     const { setUser } = useAuthStore();
     let navigate = useNavigate();
     const { tenant } = useParams();
@@ -61,7 +65,9 @@ export const useLoginMutation = () => {
             });
 
             toast.success("Login exitoso.");
-            navigate(`/${tenant}`);
+            if (options.redirect) {
+                navigate(`/${tenant}`);
+            }
         },
         onError: (error: any) => {
             console.error("Login Error:", error);

@@ -13,18 +13,24 @@ import {
 import { Timer } from "lucide-react";
 
 export const SessionMonitor = () => {
-    const { isAuthenticated, logout, expiresAt } = useAuthStore();
+    const { isAuthenticated, logout, refreshExpiresAt } = useAuthStore();
     const { mutate: refreshSession, isPending } = useRefreshMutation();
     const ALERT_THRESHOLD = 60; // Mostrar alerta cuando queden 60 segundos
     const [showAlert, setShowAlert] = useState(false);
     const [timeLeft, setTimeLeft] = useState(ALERT_THRESHOLD);
 
     useEffect(() => {
-        if (!isAuthenticated || !expiresAt) return;
+        if (!isAuthenticated || !refreshExpiresAt) return;
+
+        // Si el tiempo de expiración se actualiza a un futuro lejano, cerramos la alerta
+        const now = Date.now();
+        if (refreshExpiresAt - now > ALERT_THRESHOLD * 1000) {
+            setShowAlert(false);
+        }
 
         const interval = setInterval(() => {
             const now = Date.now();
-            const diff = expiresAt - now;
+            const diff = refreshExpiresAt - now;
             const secondsLeft = Math.floor(diff / 1000);
 
             if (secondsLeft <= ALERT_THRESHOLD && secondsLeft > 0) {
@@ -40,8 +46,7 @@ export const SessionMonitor = () => {
         }, 1000);
 
         return () => clearInterval(interval);
-    }, [isAuthenticated, expiresAt, logout, ALERT_THRESHOLD]);
-
+    }, [isAuthenticated, refreshExpiresAt, logout, ALERT_THRESHOLD]);
 
 
     const handleLogout = () => {
@@ -50,17 +55,13 @@ export const SessionMonitor = () => {
     };
 
     const handleMaintainSession = async () => {
-
-        refreshSession(undefined, {
-            onSuccess: () => setShowAlert(false),
-            onError: () => handleLogout(),
-        });
+        refreshSession();
     };
 
     if (!showAlert) return null;
 
     return (
-        <Dialog open={showAlert} onOpenChange={(open) => !open && setShowAlert(false)}>
+        <Dialog open={showAlert} onOpenChange={(open) => !open && !isPending && setShowAlert(false)}>
             <DialogContent className="max-w-md" showCloseButton={false}>
                 <DialogHeader>
                     <DialogTitle className="flex items-center gap-2 text-xl">

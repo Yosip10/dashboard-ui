@@ -6,7 +6,7 @@ import { PublicRoute } from "./app/router/PublicRoute";
 import ErrorPage from "./shared/components/errorPage";
 import CompanyNoFound from "./shared/components/companyNoFound";
 import { TenantGuard } from "./app/router/TenantGuard";
-import { SessionMonitor } from "./shared/components/session-monitor";
+import { useTokenRefresh } from "./features/login/hooks/use-token-refresh";
 
 const router = createBrowserRouter([
     {
@@ -49,12 +49,9 @@ const router = createBrowserRouter([
 
 
 function App() {
-    return (
-        <>
-            <RouterProvider router={router} />
-            <SessionMonitor />
-        </>
-    );
+    useTokenRefresh();
+
+    return <RouterProvider router={router} />;
 }
 
 export default App;

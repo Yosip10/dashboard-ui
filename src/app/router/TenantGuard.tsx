@@ -4,6 +4,7 @@ import { Navigate, Outlet, useParams } from "react-router";
 import { fetchTenantConfig, type TenantConfig } from "@/shared/services/tenant.service";
 import { TenantContext } from "@/shared/context/TenantContext";
 import { Loader } from "@/shared/components/loader";
+import { SessionMonitor } from "@/shared/components/session-monitor";
 
 export const TenantGuard = () => {
     const { tenant } = useParams();
@@ -93,6 +94,7 @@ export const TenantGuard = () => {
     // Caso 4: Éxito -> Proporcionar Contexto y Renderizar Outlet
     return (
         <TenantContext.Provider value={{ tenantConfig: currentTenant }}>
+            <SessionMonitor />
             <Outlet />
         </TenantContext.Provider>
     );

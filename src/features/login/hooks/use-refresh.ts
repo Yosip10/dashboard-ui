@@ -8,13 +8,12 @@ export const useRefreshMutation = () => {
 
     return useMutation({
         mutationFn: async () => {
-            if (!user?.refresh_token || !user?.['x-accountId']) {
+            if (!user?.refresh_token) {
                 throw new Error("Missing session information");
             }
 
             const { data: refreshResult } = await refreshService(
-                user.refresh_token,
-                user['x-accountId']
+                user.refresh_token
             );
             return refreshResult;
         },

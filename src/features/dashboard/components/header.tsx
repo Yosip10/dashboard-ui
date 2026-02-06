@@ -4,14 +4,28 @@ import { useAuthStore } from "@/features/login/store/auth.store";
 import { Avatar, AvatarFallback, AvatarImage } from "@/shared/ui/avatar";
 import { Button } from "@/shared/ui/button";
 import { Input } from "@/shared/ui/input";
-import { Search, Bell, Settings } from "lucide-react";
+import { Search, Bell, Settings, Menu } from "lucide-react";
 
-export function Header() {
+interface HeaderProps {
+    onMenuClick: () => void;
+}
+
+export function Header({ onMenuClick }: HeaderProps) {
     const { user } = useAuthStore();
     const userInitial = user?.name ? user.name.charAt(0).toUpperCase() : "U";
 
     return (
-        <header className="h-16 border-b border-gray-200 bg-background px-6 flex items-center justify-between">
+        <header className="h-16 border-b border-gray-200 bg-background px-4 md:px-6 flex items-center justify-between sticky top-0 z-20">
+            <div className="flex items-center gap-1">
+                <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={onMenuClick}
+                    className="lg:hidden hover:bg-primary/10 hover:text-primary transition-colors duration-200"
+                >
+                    <Menu className="w-5 h-5" />
+                </Button>
+            </div>
             {/* Search */}
             <div className="relative w-80">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />

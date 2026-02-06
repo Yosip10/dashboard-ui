@@ -10,6 +10,8 @@ import { TenantContext } from "@/shared/context/TenantContext";
 interface SidebarProps {
     activeView: ViewType;
     onViewChange: (view: ViewType) => void;
+    isOpen?: boolean;
+    onClose?: () => void;
 }
 
 const menuItems = [
@@ -22,7 +24,7 @@ const menuItems = [
     },
 ];
 
-export function Sidebar({ activeView, onViewChange }: SidebarProps) {
+export function Sidebar({ activeView, onViewChange, isOpen }: SidebarProps) {
     const navigate = useNavigate();
     const { logout } = useAuthStore();
     const context = useContext(TenantContext);
@@ -35,7 +37,12 @@ export function Sidebar({ activeView, onViewChange }: SidebarProps) {
 
 
     return (
-        <aside className="w-72 bg-background border-r border-gray-200 flex flex-col">
+        <aside
+            className={cn(
+                "fixed inset-y-0 left-0 z-40 w-72 bg-background border-r border-gray-200 flex flex-col transition-transform duration-300 ease-in-out lg:relative lg:translate-x-0",
+                isOpen ? "translate-x-0" : "-translate-x-full"
+            )}
+        >
             {/* Logo */}
             <div className="p-[17.5px] border-b border-gray-200 h-16">
                 <div className="flex items-center gap-3">
@@ -63,7 +70,7 @@ export function Sidebar({ activeView, onViewChange }: SidebarProps) {
                                         "w-full flex items-center gap-3 px-3 py-2 rounded-md transition-all duration-200 group cursor-pointer",
                                         isActive
                                             ? "bg-primary/10 text-primary shadow-sm"
-                                            : "text-muted-foreground hover:bg-gray-200 hover:text-foreground",
+                                            : "text-muted-foreground hover:bg-gray-100 hover:text-foreground",
                                     )}
                                 >
                                     {/* Glassmorphism icon container */}

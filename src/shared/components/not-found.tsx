@@ -2,7 +2,7 @@ import { Button } from "@/shared/ui/button"
 import { Mail } from "lucide-react"
 import { Link } from "react-router"
 
-export default function NotFound() {
+function NotFound() {
     return (
         <main className="min-h-screen bg-linear-to-b from-slate-50 to-slate-100 flex items-center justify-center px-4 py-12">
             <div className="max-w-2xl w-full text-center">
@@ -51,3 +51,4 @@ export default function NotFound() {
         </main>
     )
 }
+export default NotFound

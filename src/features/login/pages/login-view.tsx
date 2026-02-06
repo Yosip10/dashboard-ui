@@ -22,7 +22,6 @@ export function LoginView() {
         rememberMe: false,
     });
 
-    console.log(tenantConfig)
     useEffect(() => {
         const remembered = localStorage.getItem("remember");
         if (remembered) {
@@ -104,7 +103,7 @@ export function LoginView() {
             <div className="w-full max-w-md relative z-10">
                 {/* Logo */}
                 <div className="text-center mb-8">
-                    <img src={tenantConfig?.logo} alt="Logo" width={100} height={100} className="mb-4 m-auto" />
+                    <img src={tenantConfig?.logo.url} alt="Logo" width={tenantConfig?.logo.width} height={tenantConfig?.logo.height} className="mb-4 m-auto" />
                     <h1 className="text-2xl font-bold text-foreground">
                         Bienvenidos
                     </h1>

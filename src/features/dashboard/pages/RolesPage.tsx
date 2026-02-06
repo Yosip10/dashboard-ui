@@ -102,10 +102,10 @@ export function RolesPage() {
 
       {/* Table */}
       <div className="overflow-hidden rounded-xs">
-        <CardHeader className="py-3 bg-muted-foreground/5 rounded mt-2 rounded-t-lg border-t-1 border-l-1 border-r-1 border-gray-200">
+        <CardHeader className="py-3 bg-muted-foreground/5 rounded mt-2 rounded-t-lg border-t border-l border-r border-gray-200">
           <CardTitle className="text-xl">Lista de Roles</CardTitle>
         </CardHeader>
-        <CardContent className="p-0 border-1 border-gray-200">
+        <CardContent className="p-0 border border-gray-200">
           <div className="overflow-x-auto">
             <Table>
               <TableHeader>

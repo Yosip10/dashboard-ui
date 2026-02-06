@@ -3,15 +3,14 @@ import DashboardPage from "@/features/dashboard/pages/DashboardPage";
 import { LoginView } from "@/features/login";
 import { ProtectedRoute } from "./app/router/ProtectedRoute";
 import { PublicRoute } from "./app/router/PublicRoute";
-import ErrorPage from "./shared/components/errorPage";
-import CompanyNoFound from "./shared/components/companyNoFound";
 import { TenantGuard } from "./app/router/TenantGuard";
 import { useTokenRefresh } from "./features/login/hooks/use-token-refresh";
+import { CompanyNotFound, NotFound } from "./shared/components";
 
 const router = createBrowserRouter([
     {
         element: <TenantGuard />,
-        errorElement: <ErrorPage />,
+        errorElement: <NotFound />,
         children: [
             {
                 element: <ProtectedRoute />,
@@ -35,15 +34,15 @@ const router = createBrowserRouter([
     },
     {
         path: "/company-no-found",
-        element: <CompanyNoFound />,
+        element: <CompanyNotFound />,
     },
     {
         path: "/404",
-        element: <ErrorPage />,
+        element: <NotFound />,
     },
     {
         path: "*",
-        element: <ErrorPage />,
+        element: <NotFound />,
     }
 ]);
 

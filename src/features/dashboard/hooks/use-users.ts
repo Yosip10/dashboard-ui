@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { useAuthStore } from "@/features/login/store/auth.store";
 
 export const useUsers = (params: ListUsersPayload = {}) => {
-    const { user, logout } = useAuthStore();
+    const { user } = useAuthStore();
     const token = user?.access_token;
     const accountId = user?.["x-accountId"];
 

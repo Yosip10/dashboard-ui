@@ -3,8 +3,7 @@ import { useAuthStore } from "@/features/login/store/auth.store";
 import { Navigate, Outlet, useParams } from "react-router";
 import { fetchTenantConfig, type TenantConfig } from "@/shared/services/tenant.service";
 import { TenantContext } from "@/shared/context/TenantContext";
-import { Loader } from "@/shared/components/loader";
-import { SessionMonitor } from "@/shared/components/session-monitor";
+import { Loader, SessionMonitor } from "@/shared/components";
 
 export const TenantGuard = () => {
     const { tenant } = useParams();
@@ -42,7 +41,7 @@ export const TenantGuard = () => {
                     }
 
                     // 3. Obtener de API (Mock)
-                    const config = await fetchTenantConfig(tenantId.toLowerCase());
+                    const config = await fetchTenantConfig(tenantId.toLocaleLowerCase());
                     // 4. Guardar en LocalStorage (Sobrescribir existente)
                     localStorage.setItem(storageKey, JSON.stringify(config));
                     setCurrentTenant(config);
@@ -50,8 +49,6 @@ export const TenantGuard = () => {
                 } catch (err) {
                     console.error("[TenantGuard] Error loading tenant:", err);
                     setError("not_found");
-                    // Nota: En una aplicación real podríamos distinguir entre 404 (no encontrado) y 500 (error del servidor)
-                    // Aquí nuestro servicio de mock lanza el error "Tenant not found", por lo que lo mapeamos a "not_found"
                 } finally {
                     setLoading(false);
                 }

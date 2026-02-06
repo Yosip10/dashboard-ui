@@ -12,7 +12,11 @@ export interface TenantConfig {
         cardBackground: string;
         border: string;
     };
-    logo: string;
+    logo: {
+        width: string;
+        height: string;
+        url: string;
+    };
 }
 
 const MOCK_TENANTS: Record<string, TenantConfig> = {
@@ -32,7 +36,11 @@ const MOCK_TENANTS: Record<string, TenantConfig> = {
             border: "#bfdbfe",       // blue-200
 
         },
-        logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/05/BBVA_2019.svg/1280px-BBVA_2019.svg.png"
+        logo: {
+            width: "100px",
+            height: "100px",
+            url: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/05/BBVA_2019.svg/1280px-BBVA_2019.svg.png"
+        }
     },
     companyb: {
         id: "companyB",
@@ -48,7 +56,11 @@ const MOCK_TENANTS: Record<string, TenantConfig> = {
             cardBackground: "#fef2f2",  // Red 50 (Un toque de calidez casi blanco)
             border: "#fecaca",          // Red 200 (Suave para separar elementos)
         },
-        logo: "https://yt3.googleusercontent.com/NHLfZYbkHdBQSLrkeIarQ1NwKs4hqJ44t9lFut7k7JsMtxVmlKwVM06El423HHaHcCDsaP5m=s900-c-k-c0x00ffffff-no-rj",
+        logo: {
+            width: "200px",
+            height: "200px",
+            url: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/59/Banco_de_Bogot%C3%A1_logo.svg/1280px-Banco_de_Bogot%C3%A1_logo.svg.png"
+        }
     },
     companyc: {
         id: "companyC",
@@ -64,7 +76,11 @@ const MOCK_TENANTS: Record<string, TenantConfig> = {
             cardBackground: "#f7f9f2", // Blanco roto con tinte lima (Muy suave)
             border: "#e2e8d4",         // Gris verdoso suave (Para estructura)
         },
-        logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6a/Falabella.svg/960px-Falabella.svg.png",
+        logo: {
+            width: "128px",
+            height: "128px",
+            url: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6a/Falabella.svg/960px-Falabella.svg.png"
+        }
     },
 };
 

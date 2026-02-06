@@ -9,6 +9,7 @@ export function AppProviders({ children }: { children: React.ReactNode }) {
             queries: {
                 staleTime: 60 * 1000,
                 retry: false,
+                refetchOnWindowFocus: false,
             },
         },
     }));

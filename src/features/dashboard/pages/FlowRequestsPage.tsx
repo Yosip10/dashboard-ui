@@ -27,6 +27,7 @@ import {
   TooltipTrigger,
 } from "@/shared/ui/tooltip";
 import { FlowRequestModal } from "../components/flow-request-modal";
+import { RequestDetailsModal } from "../components/request-details-modal";
 
 const flowRequests = [
   {
@@ -85,6 +86,13 @@ const statusStyles = {
 export function FlowRequestsPage() {
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
+  const [detailsModalOpen, setDetailsModalOpen] = useState(false);
+  const [selectedRequest, setSelectedRequest] = useState<(typeof flowRequests)[0] | null>(null);
+
+  const handleViewDetails = (request: (typeof flowRequests)[0]) => {
+    setSelectedRequest(request);
+    setDetailsModalOpen(true);
+  };
 
   const copyToClipboard = (text: string, id: string) => {
     navigator.clipboard.writeText(text);
@@ -96,6 +104,7 @@ export function FlowRequestsPage() {
     <TooltipProvider>
       <div className="space-y-6">
         <FlowRequestModal open={modalOpen} onOpenChange={setModalOpen} />
+        <RequestDetailsModal open={detailsModalOpen} onOpenChange={setDetailsModalOpen} request={selectedRequest} />
 
         <div className="flex items-center justify-between">
           <div>
@@ -264,6 +273,7 @@ export function FlowRequestsPage() {
                           variant="ghost"
                           size="icon"
                           className="h-8 w-8 hover:bg-primary/10 hover:text-primary"
+                          onClick={() => handleViewDetails(request)}
                         >
                           <Eye className="w-4 h-4" />
                         </Button>

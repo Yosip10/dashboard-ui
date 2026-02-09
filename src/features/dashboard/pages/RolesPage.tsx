@@ -15,7 +15,13 @@ import {
   TableHeader,
   TableRow,
 } from "@/shared/ui/table";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/shared/ui/tooltip";
 import { RoleModal } from "../components/role-modal";
+import { RoleDetailsModal } from "../components/role-details-modal";
 
 const roles = [
   {
@@ -25,7 +31,7 @@ const roles = [
       { initials: "JS", color: "bg-blue-500" },
       { initials: "PM", color: "bg-purple-500" },
     ],
-    modules: ["Usuarios", "Roles", "Configuración", "Reportes"],
+    modules: ["Usuarios", "Roles", "Configuración", "Reportes", "Logs", "Auditoría", "Contenido", "Medios", "Publicaciones", "Dashboard"],
     active: true,
   },
   {
@@ -35,7 +41,7 @@ const roles = [
       { initials: "MG", color: "bg-green-500" },
       { initials: "RR", color: "bg-orange-500" },
     ],
-    modules: ["Contenido", "Medios", "Publicaciones"],
+    modules: ["Contenido", "Medios", "Publicaciones", "Dashboard", "Reportes"],
     active: true,
   },
   {
@@ -62,6 +68,13 @@ export function RolesPage() {
   const [selectedRole, setSelectedRole] = useState<(typeof roles)[0] | null>(
     null,
   );
+  const [detailsModalOpen, setDetailsModalOpen] = useState(false);
+  const [viewRole, setViewRole] = useState<(typeof roles)[0] | null>(null);
+
+  const handleViewDetails = (role: (typeof roles)[0]) => {
+    setViewRole(role);
+    setDetailsModalOpen(true);
+  };
 
   const handleEdit = (role: (typeof roles)[0]) => {
     setSelectedRole(role);
@@ -79,6 +92,11 @@ export function RolesPage() {
         open={modalOpen}
         onOpenChange={setModalOpen}
         role={selectedRole}
+      />
+      <RoleDetailsModal
+        open={detailsModalOpen}
+        onOpenChange={setDetailsModalOpen}
+        role={viewRole}
       />
 
       {/* Header */}
@@ -159,12 +177,23 @@ export function RolesPage() {
                           </Badge>
                         ))}
                         {role.modules.length > 3 && (
-                          <Badge
-                            variant="secondary"
-                            className="bg-muted text-muted-foreground text-xs"
-                          >
-                            +{role.modules.length - 3}
-                          </Badge>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Badge
+                                variant="secondary"
+                                className="bg-muted text-muted-foreground text-xs cursor-help"
+                              >
+                                +{role.modules.length - 3}
+                              </Badge>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <div className="flex flex-col gap-1">
+                                {role.modules.slice(3).map((module) => (
+                                  <span key={module}>{module}</span>
+                                ))}
+                              </div>
+                            </TooltipContent>
+                          </Tooltip>
                         )}
                       </div>
                     </TableCell>
@@ -180,6 +209,7 @@ export function RolesPage() {
                           variant="ghost"
                           size="icon"
                           className="h-8 w-8 hover:bg-primary/10 hover:text-primary"
+                          onClick={() => handleViewDetails(role)}
                         >
                           <Eye className="w-4 h-4" />
                         </Button>

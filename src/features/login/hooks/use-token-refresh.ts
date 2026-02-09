@@ -22,7 +22,7 @@ export const useTokenRefresh = () => {
 
             console.log(`[TokenRefresh] Checking: ${secondsLeft}s left. Cooldown: ${isOnCooldown ? 'Active' : 'Expired'} (${Math.floor(timeSinceLastRefresh / 1000)}s since last)`);
 
-            // Trigger refresh exactly when 1 minute (60s) or less is left
+            // Activar la actualización exactamente cuando quede 1 minuto (60 s) o menos
             if (secondsLeft <= 60 && secondsLeft > 0 && !isPending && !isOnCooldown) {
                 console.warn(`[TokenRefresh] Threshold reached (${secondsLeft}s). Triggering refresh...`);
                 lastRefreshTime.current = now;
@@ -32,7 +32,7 @@ export const useTokenRefresh = () => {
             }
         };
 
-        // Increase check frequency to 10s for better accuracy
+        // Aumente la frecuencia de verificación a 10 segundos para una mayor precisión
         const interval = setInterval(checkRefresh, 10000);
 
         // Immediate check on mount

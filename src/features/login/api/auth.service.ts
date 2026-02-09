@@ -2,6 +2,7 @@ import apiClient from "../../../shared/api/api-client";
 import type { LoginResponse } from "../types/auth";
 
 const apiUrl = import.meta.env.VITE_HOST_API_AUTH;
+const apiUrlRefresh = import.meta.env.VITE_HOST_API_REFRESH;
 
 export const signinService = (data: any, accountId: string) => {
     const headers = { "x-accountId": accountId, 'content-type': 'application/x-www-form-urlencoded' };
@@ -30,7 +31,7 @@ export const logoutService = (accountId: string, refresh_token: string) => {
 }; */
 
 export const refreshService = async (refreshToken: string) => {
-    const url = "https://apigw-v2-dev.ado-tech.com/auth/realms/TuyaQA/protocol/openid-connect/token";
+    const url = `${apiUrlRefresh}/auth/realms/TuyaQA/protocol/openid-connect/token`;
     const params = new URLSearchParams();
     params.append("grant_type", "refresh_token");
     params.append("client_id", "sign-in-scope");

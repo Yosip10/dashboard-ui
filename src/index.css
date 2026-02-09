@@ -164,3 +164,35 @@ button {
     opacity: 0.15;
   }
 }
+
+/* 1. Contenedor de la barra */
+*::-webkit-scrollbar {
+  width: 10px;
+  /* Un poco más delgada es más elegante */
+  height: 10px;
+  /* Para scroll horizontal */
+}
+
+/* 2. El fondo (Track) */
+*::-webkit-scrollbar-track {
+  background: transparent;
+  /* Fondo transparente para que no ensucie el diseño */
+}
+
+/* 3. El indicador (Thumb) */
+*::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.2);
+  /* Color neutro y traslúcido */
+  border-radius: 10px;
+  /* Bordes totalmente redondeados */
+  border: 2px solid transparent;
+  /* Truco de padding: espacio alrededor */
+  background-clip: content-box;
+  /* Hace que el color no toque los bordes */
+}
+
+/* 4. Efecto al pasar el mouse (Hover) */
+*::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(0, 0, 0, 0.4);
+  /* Se oscurece ligeramente al interactuar */
+}

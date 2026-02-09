@@ -36,7 +36,7 @@ export function FlowRequestModal({ open, onOpenChange }: FlowRequestModalProps) 
           <div className="space-y-2">
             <Label htmlFor="docType">Tipo de Documento</Label>
             <Select value={formData.docType} onValueChange={(value) => setFormData({ ...formData, docType: value })}>
-              <SelectTrigger className="h-11 bg-muted/50 border-transparent focus:border-blue-500">
+              <SelectTrigger className="h-11 bg-muted/50 border-transparent focus:border-primary">
                 <SelectValue placeholder="Seleccione tipo de documento" />
               </SelectTrigger>
               <SelectContent>
@@ -54,7 +54,7 @@ export function FlowRequestModal({ open, onOpenChange }: FlowRequestModalProps) 
               value={formData.document}
               onChange={(e) => setFormData({ ...formData, document: e.target.value })}
               placeholder="Ej: FAC-2025-0001"
-              className="h-11 bg-muted/50 border-transparent focus:border-blue-500"
+              className="h-11 bg-muted/50 border-transparent focus:border-primary"
               required
             />
           </div>
@@ -66,7 +66,7 @@ export function FlowRequestModal({ open, onOpenChange }: FlowRequestModalProps) 
               value={formData.key}
               onChange={(e) => setFormData({ ...formData, key: e.target.value })}
               placeholder="Ingrese la clave de acceso"
-              className="h-11 bg-muted/50 border-transparent focus:border-blue-500"
+              className="h-11 bg-muted/50 border-transparent focus:border-primary"
               required
             />
           </div>
@@ -79,18 +79,18 @@ export function FlowRequestModal({ open, onOpenChange }: FlowRequestModalProps) 
               value={formData.url}
               onChange={(e) => setFormData({ ...formData, url: e.target.value })}
               placeholder="https://api.example.com/flow/..."
-              className="h-11 bg-muted/50 border-transparent focus:border-blue-500"
+              className="h-11 bg-muted/50 border-transparent focus:border-primary"
               required
             />
           </div>
 
           <div className="flex gap-3 pt-4">
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)} className="flex-1 h-11">
+            <Button type="button" variant="secondary" onClick={() => onOpenChange(false)} className="flex-1 h-11">
               Cancelar
             </Button>
             <Button
               type="submit"
-              className="flex-1 h-11 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 shadow-lg shadow-blue-500/25"
+              className="flex-1 h-11 bg-linear-to-r from-primary to-primary/80 hover:from-primary/80 hover:to-primary shadow-lg shadow-primary/25"
             >
               Crear Solicitud
             </Button>

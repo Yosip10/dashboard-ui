@@ -120,7 +120,7 @@ const SessionMonitor = () => {
                         <Button
                             type="submit"
                             disabled={isPending || !password}
-                            className="bg-primary hover:bg-primary/80 text-white min-w-[140px]"
+                            className="bg-primary hover:bg-primary/80 text-white min-w-35"
                         >
                             {isPending ? "Validando..." : "Mantener sesión"}
                         </Button>

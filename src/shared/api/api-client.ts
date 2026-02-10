@@ -13,7 +13,7 @@ apiClient.interceptors.request.use(
                 const { state } = JSON.parse(storage);
                 const token = state?.user?.access_token;
 
-                if (token) {
+                if (token && !config.headers.Authorization) {
                     config.headers.Authorization = `Bearer ${token}`;
                 }
             }

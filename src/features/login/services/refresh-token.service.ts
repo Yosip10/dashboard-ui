@@ -1,26 +1,7 @@
 import apiClient from "../../../shared/api/api-client";
-import type { LoginResponse } from "../types/auth";
-import type { UserInfo } from "../types/user-info";
+import type { LoginResponse } from "../types/login-response";
 
-const apiUrl = import.meta.env.VITE_HOST_API_AUTH;
 const apiUrlInfo = import.meta.env.VITE_HOST_API_INFO;
-
-export const signinService = (data: any, accountId: string) => {
-    const headers = { "x-accountId": accountId, 'content-type': 'application/x-www-form-urlencoded' };
-    return apiClient.post<LoginResponse>(`${apiUrl}/auth/token/${accountId}`, { ...data, grant_type: 'password', client_id: "sign-in-scope" }, {
-        headers,
-    });
-};
-
-export const logoutService = (accountId: string, refresh_token: string) => {
-    const headers = { "x-accountId": accountId };
-    return apiClient.post(`${apiUrl}/auth/logout`, {
-        refresh_token,
-
-    }, {
-        headers,
-    });
-};
 
 export const refreshService = async (refreshToken: string) => {
     const url = `${apiUrlInfo}/auth/realms/TuyaQA/protocol/openid-connect/token`;
@@ -46,13 +27,4 @@ export const refreshService = async (refreshToken: string) => {
             refreshExpiresIn: data.refresh_expires_in,
         } as LoginResponse
     };
-};
-
-
-export const getUserInformation = async (tenant: string, token?: string) => {
-    const config = token ? { headers: { Authorization: `Bearer ${token}` } } : {};
-    return apiClient.get<UserInfo>(
-        `${apiUrlInfo}/${tenant}/v1/getDetailUser`,
-        config
-    );
 };

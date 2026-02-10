@@ -1,14 +1,4 @@
-export interface Group {
-    id: string;
-    name: string;
-    path: string;
-    attributes: {
-        modulesLinked?: string[];
-        description?: string[];
-    };
-    realmRoles: string[];
-    clientRoles: Record<string, string[]>;
-}
+
 
 export interface UserModule {
     name: string;
@@ -46,22 +36,7 @@ export interface LoginResponse {
     [key: string]: any;
 }
 
-export interface UserInfoResponse {
-    success: boolean;
-    message: string;
-    StatusCode: number;
-    code: string;
-    data: {
-        id: string;
-        username: string;
-        firstName: string;
-        lastName: string;
-        email: string;
-        attributes: Record<string, string[]>;
-        groups: Group[];
-        [key: string]: any;
-    };
-}
+
 
 export interface AuthState {
     user: User | null;

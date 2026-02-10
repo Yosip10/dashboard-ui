@@ -1,7 +1,8 @@
 import { useMutation } from "@tanstack/react-query";
-import { signinService, getUserAllInfoService } from "../api/auth.service";
+import { signinService } from "../services/sign-in.service";
+import { getUserInformation } from "../services/user-info.service";
 import { useAuthStore } from "../store/auth.store";
-import { handleRoleModule, handleRoleName, parseUserAttributes } from "../utils/auth.helpers";
+
 import { toast } from "sonner";
 import { useNavigate, useParams } from "react-router";
 
@@ -29,18 +30,10 @@ export const useLoginMutation = (options: LoginOptions = { redirect: true }) => 
             const { data: authResult } = await signinService(bodyLogin, accountId);
             const authData = authResult;
             // 2. Get user info
-            const { data: userInfoResult } = await getUserAllInfoService(
-                { accessToken: authData.accessToken },
-                accountId
-            );
-            const { data: userData } = userInfoResult;
+            const { data: userData } = await getUserInformation("tuyaQA", authData.accessToken);
             return { authData, userData, accountId, username, rememberMe };
         },
         onSuccess: ({ authData, userData, accountId, username, rememberMe }) => {
-            const userObject = parseUserAttributes(userData?.attributes);
-            const groups = handleRoleModule(userData?.groups);
-            const role = handleRoleName(userData?.groups);
-
             if (rememberMe) {
                 localStorage.setItem('remember', JSON.stringify({ username, accountId }));
             } else {
@@ -48,20 +41,21 @@ export const useLoginMutation = (options: LoginOptions = { redirect: true }) => 
             }
 
             setUser({
-                ...userObject,
-                name: `${userData?.firstName} ${userData?.lastName}`,
-                given_name: userData?.firstName,
-                family_name: userData?.lastName,
-                email: userData?.email,
+                ...userData,
+                id: userData.sub,
+                name: userData.name,
+                given_name: userData.given_name,
+                family_name: userData.family_name,
+                email: userData.email,
+                username: userData.preferred_username,
                 access_token: authData.accessToken,
                 refresh_token: authData.refreshToken,
                 expires_in: authData.expiresIn,
                 refresh_expires_in: authData.refreshExpiresIn || 0,
-                username: username,
-                'x-accountId': accountId,
+                "x-accountId": accountId,
                 realm: accountId,
-                groups,
-                role
+                groups: [],
+                role: []
             });
 
             toast.success("Login exitoso.");

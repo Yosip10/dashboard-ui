@@ -12,9 +12,10 @@ import {
   TableHeader,
   TableRow,
 } from "@/shared/ui/table";
-import { UserModal } from "../components/user-modal";
+import { UpdateUserModal } from "../components/update-user-modal";
 import { UserDetailsModal } from "../components/user-details-modal";
 import { CreateUserModal } from "../components/create-user-modal";
+import { DeleteUserAlert } from "../components/delete-user-alert";
 import { useUsers } from "../hooks/use-users";
 
 export function UsersPage() {
@@ -22,6 +23,7 @@ export function UsersPage() {
   const [modalOpen, setModalOpen] = useState(false);
   const [detailsOpen, setDetailsOpen] = useState(false);
   const [createModalOpen, setCreateModalOpen] = useState(false);
+  const [deleteAlertOpen, setDeleteAlertOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<any>(null);
 
   const usersData = response?.data?.users || [];
@@ -34,6 +36,11 @@ export function UsersPage() {
   const handleView = (user: any) => {
     setSelectedUser(user);
     setDetailsOpen(true);
+  };
+
+  const handleDelete = (user: any) => {
+    setSelectedUser(user);
+    setDeleteAlertOpen(true);
   };
 
   const handleNew = () => {
@@ -60,7 +67,7 @@ export function UsersPage() {
 
   return (
     <div className="space-y-6">
-      <UserModal
+      <UpdateUserModal
         open={modalOpen}
         onOpenChange={setModalOpen}
         user={selectedUser}
@@ -75,6 +82,12 @@ export function UsersPage() {
       <CreateUserModal
         open={createModalOpen}
         onOpenChange={setCreateModalOpen}
+      />
+
+      <DeleteUserAlert
+        open={deleteAlertOpen}
+        onOpenChange={setDeleteAlertOpen}
+        user={selectedUser}
       />
 
 
@@ -180,6 +193,7 @@ export function UsersPage() {
                           variant="ghost"
                           size="icon"
                           className="h-8 w-8 hover:bg-red-500/10 hover:text-red-600"
+                          onClick={() => handleDelete(user)}
                         >
                           <Trash2 className="w-4 h-4" />
                         </Button>
@@ -195,3 +209,4 @@ export function UsersPage() {
     </div>
   );
 }
+

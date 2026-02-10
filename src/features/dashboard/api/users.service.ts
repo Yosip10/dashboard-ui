@@ -1,10 +1,8 @@
 import apiClient from "../../../shared/api/api-client";
-import type { ListUsersResponse, ListUsersPayload, CreateUserRequest, CreateUserResponse } from "../types/users";
+import type { ListUsersResponse, ListUsersPayload, CreateUserRequest, CreateUserResponse, UpdateUserRequest, GenericResponse } from "../types/users";
 
-// Base URL provided by the user
-const API_URL = "https://api-fintecheart-qa.ado-tech.com/api/v1/auth/list-users";
-const CREATE_USER_URL = "https://api-fintecheart.ado-tech.com/api/v1/Request/createRequestMongo";
 
+const API_URL = import.meta.env.VITE_HOST_API_INFO;
 const DEFAULT_PAYLOAD: ListUsersPayload = {
     attributesToGet: "",
     filter: "",
@@ -23,12 +21,37 @@ export const getUsersService = async (accountId: string, payload: ListUsersPaylo
 };
 
 export const createUserService = async (data: CreateUserRequest, accountId: string) => {
-    const response = await apiClient.post<CreateUserResponse>(CREATE_USER_URL, data, {
+    const response = await apiClient.post<CreateUserResponse>(API_URL, data, {
+        headers: {
+            "x-accountId": accountId,
+            "Content-Type": "application/json"
+        }
+    });
+    return response.data;
+};
+
+export const updateUserService = async (data: UpdateUserRequest, accountId: string) => {
+    const updatePayload = {
+        firstName: data.firstName,
+        lastName: data.lastName,
+        email: data.email,
+        enabled: data.enabled
+    };
+
+    const response = await apiClient.put<GenericResponse>(`${API_URL}/${data.id}`, updatePayload, {
+        headers: {
+            "x-accountId": accountId,
+            "Content-Type": "application/json"
+        }
+    });
+    return response.data;
+};
+
+export const deleteUserService = async (userId: string, accountId: string) => {
+    const response = await apiClient.delete<GenericResponse>(`${API_URL}/${userId}`, {
         headers: {
             "x-accountId": accountId
         }
     });
     return response.data;
 };
-
-

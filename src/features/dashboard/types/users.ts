@@ -66,35 +66,41 @@ export interface ListUsersPayload {
     skip?: number;
 }
 
-export interface CreateUserRequest {
-    typeRequest: number;
-    observation: string;
-    asing_to: string;
-    dataUserModel: {
-        reference: number;
-        email: string;
-        cc: string;
-        enable: boolean;
-        name: string;
-        lastname: string;
-        adviserCode: string;
-        adviseDocument: string;
-        gener: string;
-        celphone: string;
-        birthDate: string;
-        picture: {
-            src: string;
-            name: string;
-        };
-        idBranch: string;
-        typeDocuemnt: string;
-        role: string;
-        idDepartment: string;
-        addres: string;
-        parentCoordinator: string;
-        parentCoordinatorName: string;
-    };
+export interface UserCredential {
+    type: string;
+    value: string;
+    temporary: boolean;
 }
+
+export interface CreateUserRequest {
+    username: string;
+    email: string;
+    enabled: boolean;
+    firstName: string;
+    lastName: string;
+    emailVerified: boolean;
+    credentials: UserCredential[];
+    attributes?: Record<string, any>; // Flexible for extra fields if needed
+    groups?: string[];
+}
+
+export interface UpdateUserRequest {
+    id: string;
+    username?: string;
+    email?: string;
+    enabled?: boolean;
+    firstName?: string;
+    lastName?: string;
+    emailVerified?: boolean;
+    credentials?: UserCredential[];
+    attributes?: Record<string, any>;
+    groups?: string[];
+}
+
+export interface DeleteUserRequest {
+    id: string;
+}
+
 
 export interface CreateUserResponse {
     success: boolean;
@@ -103,3 +109,9 @@ export interface CreateUserResponse {
     data?: any;
 }
 
+export interface GenericResponse {
+    success: boolean;
+    message: string;
+    StatusCode: string;
+    data?: any;
+}

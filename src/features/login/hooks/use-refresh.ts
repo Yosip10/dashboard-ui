@@ -1,5 +1,5 @@
 import { useMutation } from "@tanstack/react-query";
-import { refreshService } from "../api/auth.service";
+import { refreshService } from "../services/refresh-token.service";
 import { useAuthStore } from "../store/auth.store";
 import { toast } from "sonner";
 

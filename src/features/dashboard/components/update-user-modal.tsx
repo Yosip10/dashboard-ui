@@ -1,20 +1,21 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/shared/ui/dialog";
 import { Button } from "@/shared/ui/button";
 import { Input } from "@/shared/ui/input";
 import { Label } from "@/shared/ui/label";
 import { Checkbox } from "@/shared/ui/checkbox";
-import { User, Mail, Lock, Loader2 } from "lucide-react";
-import { useCreateUserMutation } from "../hooks/use-create-user";
-import { toast } from "sonner";
+import { Mail, Loader2, Pencil } from "lucide-react";
+import { useUpdateUserMutation } from "../hooks/use-update-user";
+import type { ListUser } from "../types/users";
 
-interface CreateUserModalProps {
+interface UpdateUserModalProps {
     open: boolean;
     onOpenChange: (open: boolean) => void;
+    user: ListUser | null;
 }
 
-export function CreateUserModal({ open, onOpenChange }: CreateUserModalProps) {
-    const { mutate: createUser, isPending } = useCreateUserMutation();
+export function UpdateUserModal({ open, onOpenChange, user }: UpdateUserModalProps) {
+    const { mutate: updateUser, isPending } = useUpdateUserMutation();
 
     // Form State
     const [formData, setFormData] = useState({
@@ -22,11 +23,20 @@ export function CreateUserModal({ open, onOpenChange }: CreateUserModalProps) {
         email: "",
         firstName: "",
         lastName: "",
-        enabled: true,
-        emailVerified: true,
-        password: "",
-        temporaryPassword: false
+        enabled: true
     });
+
+    useEffect(() => {
+        if (user) {
+            setFormData({
+                username: user.username || "",
+                email: user.email || "",
+                firstName: user.firstName || "",
+                lastName: user.lastName || "",
+                enabled: user.enabled ?? true
+            });
+        }
+    }, [user, open]);
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value, type, checked } = e.target;
@@ -43,55 +53,35 @@ export function CreateUserModal({ open, onOpenChange }: CreateUserModalProps) {
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
 
-        if (!formData.username || !formData.email || !formData.password) {
-            toast.error("Por favor completa los campos obligatorios.");
-            return;
-        }
+        if (!user) return;
 
-        const payload = {
-            username: formData.username,
-            email: formData.email,
-            enabled: formData.enabled,
+        const payload: any = {
+            id: user.id,
             firstName: formData.firstName,
             lastName: formData.lastName,
-            emailVerified: formData.emailVerified,
-            credentials: [
-                {
-                    type: "password",
-                    value: formData.password,
-                    temporary: formData.temporaryPassword
-                }
-            ]
+            email: formData.email,
+            enabled: formData.enabled
         };
 
-        createUser(payload, {
+        updateUser(payload, {
             onSuccess: (data) => {
                 if (data.success) {
                     onOpenChange(false);
-                    // Reset form
-                    setFormData({
-                        username: "",
-                        email: "",
-                        firstName: "",
-                        lastName: "",
-                        enabled: true,
-                        emailVerified: true,
-                        password: "",
-                        temporaryPassword: false
-                    });
                 }
             }
         });
     };
+
+    if (!user) return null;
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent className="sm:max-w-[500px] p-0 overflow-hidden border-none shadow-2xl rounded-xl">
                 <DialogHeader className="p-6 bg-primary/80 text-white">
                     <DialogTitle className="text-xl font-bold flex items-center gap-2">
-                        <User className="w-5 h-5" /> Crear Nuevo Usuario
+                        <Pencil className="w-5 h-5" /> Editar Usuario
                     </DialogTitle>
-                    <p className="text-secondary text-sm opacity-90">Ingresa los datos para registrar un nuevo usuario en el sistema.</p>
+                    <p className="text-secondary text-sm opacity-90">Modifica los datos del usuario @{user.username}</p>
                 </DialogHeader>
 
                 <form onSubmit={handleSubmit} className="p-6 space-y-4 max-h-[70vh] overflow-y-auto custom-scrollbar">
@@ -99,25 +89,23 @@ export function CreateUserModal({ open, onOpenChange }: CreateUserModalProps) {
                     {/* Username & Email */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="space-y-2">
-                            <Label htmlFor="username" className="text-sm font-semibold">Usuario (Username)</Label>
+                            <Label htmlFor="username_edit" className="text-sm font-semibold">Usuario (Username)</Label>
                             <Input
-                                id="username"
+                                id="username_edit"
                                 name="username"
-                                placeholder="ej. usuario.apigw"
                                 value={formData.username}
-                                onChange={handleInputChange}
-                                required
+                                disabled
+                                className="bg-muted text-muted-foreground"
                             />
                         </div>
                         <div className="space-y-2">
-                            <Label htmlFor="email" className="text-sm font-semibold">Correo Electrónico</Label>
+                            <Label htmlFor="email_edit" className="text-sm font-semibold">Correo Electrónico</Label>
                             <div className="relative">
                                 <Mail className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                                 <Input
-                                    id="email"
+                                    id="email_edit"
                                     name="email"
                                     type="email"
-                                    placeholder="correo@ejemplo.com"
                                     className="pl-9"
                                     value={formData.email}
                                     onChange={handleInputChange}
@@ -130,70 +118,36 @@ export function CreateUserModal({ open, onOpenChange }: CreateUserModalProps) {
                     {/* First Name & Last Name */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="space-y-2">
-                            <Label htmlFor="firstName" className="text-sm font-semibold">Nombre</Label>
+                            <Label htmlFor="firstName_edit" className="text-sm font-semibold">Nombre</Label>
                             <Input
-                                id="firstName"
+                                id="firstName_edit"
                                 name="firstName"
-                                placeholder="Nombre"
                                 value={formData.firstName}
                                 onChange={handleInputChange}
+                                required
                             />
                         </div>
                         <div className="space-y-2">
-                            <Label htmlFor="lastName" className="text-sm font-semibold">Apellido</Label>
+                            <Label htmlFor="lastName_edit" className="text-sm font-semibold">Apellido</Label>
                             <Input
-                                id="lastName"
+                                id="lastName_edit"
                                 name="lastName"
-                                placeholder="Apellido"
                                 value={formData.lastName}
                                 onChange={handleInputChange}
+                                required
                             />
                         </div>
                     </div>
 
-                    {/* Password Section */}
-                    <div className="space-y-3 pt-2 border-t border-border">
-                        <Label htmlFor="password" className="text-sm font-semibold flex items-center gap-2">
-                            <Lock className="w-4 h-4 text-primary" /> Contraseña Inicial
-                        </Label>
-                        <Input
-                            id="password"
-                            name="password"
-                            type="password"
-                            placeholder="Contraseña segura"
-                            value={formData.password}
-                            onChange={handleInputChange}
-                            required
-                        />
-                        <div className="flex items-center space-x-2">
-                            <Checkbox
-                                id="temporaryPassword"
-                                checked={formData.temporaryPassword}
-                                onCheckedChange={(checked) => handleCheckboxChange("temporaryPassword", checked as boolean)}
-                            />
-                            <Label htmlFor="temporaryPassword" className="text-xs font-normal cursor-pointer">
-                                ¿Contraseña temporal? (El usuario deberá cambiarla al iniciar sesión)
-                            </Label>
-                        </div>
-                    </div>
-
-                    {/* Checkboxes: Enabled & Email Verified */}
+                    {/* Checkbox: Enabled */}
                     <div className="flex gap-6 pt-2">
                         <div className="flex items-center space-x-2">
                             <Checkbox
-                                id="enabled"
+                                id="enabled_edit"
                                 checked={formData.enabled}
                                 onCheckedChange={(checked) => handleCheckboxChange("enabled", checked as boolean)}
                             />
-                            <Label htmlFor="enabled" className="text-sm cursor-pointer">Usuario Habilitado</Label>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                            <Checkbox
-                                id="emailVerified"
-                                checked={formData.emailVerified}
-                                onCheckedChange={(checked) => handleCheckboxChange("emailVerified", checked as boolean)}
-                            />
-                            <Label htmlFor="emailVerified" className="text-sm cursor-pointer">Email Verificado</Label>
+                            <Label htmlFor="enabled_edit" className="text-sm cursor-pointer">Usuario Habilitado</Label>
                         </div>
                     </div>
 
@@ -214,10 +168,10 @@ export function CreateUserModal({ open, onOpenChange }: CreateUserModalProps) {
                             {isPending ? (
                                 <>
                                     <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                                    Creando...
+                                    Actualizando...
                                 </>
                             ) : (
-                                "Crear Usuario"
+                                "Guardar Cambios"
                             )}
                         </Button>
                     </div>

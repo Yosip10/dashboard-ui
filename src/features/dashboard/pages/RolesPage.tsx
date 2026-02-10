@@ -22,6 +22,7 @@ import {
 } from "@/shared/ui/tooltip";
 import { RoleModal } from "../components/role-modal";
 import { RoleDetailsModal } from "../components/role-details-modal";
+import DeleteRolesAlert from "../components/delete-roles-alert";
 
 const roles = [
   {
@@ -69,6 +70,7 @@ export function RolesPage() {
     null,
   );
   const [detailsModalOpen, setDetailsModalOpen] = useState(false);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [viewRole, setViewRole] = useState<(typeof roles)[0] | null>(null);
 
   const handleViewDetails = (role: (typeof roles)[0]) => {
@@ -86,6 +88,11 @@ export function RolesPage() {
     setModalOpen(true);
   };
 
+  const handleDelete = (role: (typeof roles)[0]) => {
+    setSelectedRole(role);
+    setDeleteModalOpen(true);
+  };
+
   return (
     <div className="space-y-6">
       <RoleModal
@@ -97,6 +104,11 @@ export function RolesPage() {
         open={detailsModalOpen}
         onOpenChange={setDetailsModalOpen}
         role={viewRole}
+      />
+      <DeleteRolesAlert
+        open={deleteModalOpen}
+        onOpenChange={setDeleteModalOpen}
+        role={selectedRole}
       />
 
       {/* Header */}
@@ -225,6 +237,7 @@ export function RolesPage() {
                           variant="ghost"
                           size="icon"
                           className="h-8 w-8 hover:bg-red-500/10 hover:text-red-600"
+                          onClick={() => handleDelete(role)}
                         >
                           <Trash2 className="w-4 h-4" />
                         </Button>

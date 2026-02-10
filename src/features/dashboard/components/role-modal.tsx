@@ -99,7 +99,7 @@ export function RoleModal({ open, onOpenChange, role }: RoleModalProps) {
           </div>
 
           <div className="flex gap-3 pt-4">
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)} className="flex-1 h-11">
+            <Button type="button" variant="secondary" onClick={() => onOpenChange(false)} className="flex-1 h-11">
               Cancelar
             </Button>
             <Button

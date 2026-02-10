@@ -1,4 +1,5 @@
-import { MOCK_TENANTS, type TenantConfig } from "../lib/mock-tenants";
+import tenants from "../../data/tenants.json";
+import type { TenantConfig } from "../lib/mock-tenants";
 
 
 export const fetchTenantConfig = async (
@@ -7,7 +8,7 @@ export const fetchTenantConfig = async (
     return new Promise((resolve, reject) => {
         // Simulate network delay
         setTimeout(() => {
-            const config = MOCK_TENANTS[tenantId];
+            const config = tenants[tenantId as keyof typeof tenants] as TenantConfig;
             if (config) {
                 resolve(config);
             } else {

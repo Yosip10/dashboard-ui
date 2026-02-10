@@ -28,6 +28,7 @@ import {
 } from "@/shared/ui/tooltip";
 import { FlowRequestModal } from "../components/flow-request-modal";
 import { RequestDetailsModal } from "../components/request-details-modal";
+import DeleteRequestAlert from "../components/delete-request-alert";
 
 const flowRequests = [
   {
@@ -87,6 +88,7 @@ export function FlowRequestsPage() {
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [detailsModalOpen, setDetailsModalOpen] = useState(false);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [selectedRequest, setSelectedRequest] = useState<(typeof flowRequests)[0] | null>(null);
 
   const handleViewDetails = (request: (typeof flowRequests)[0]) => {
@@ -100,116 +102,93 @@ export function FlowRequestsPage() {
     setTimeout(() => setCopiedId(null), 2000);
   };
 
+  const handleDelete = (request: (typeof flowRequests)[0]) => {
+    setSelectedRequest(request);
+    setDeleteModalOpen(true);
+  };
+
   return (
-    <TooltipProvider>
-      <div className="space-y-6">
-        <FlowRequestModal open={modalOpen} onOpenChange={setModalOpen} />
-        <RequestDetailsModal open={detailsModalOpen} onOpenChange={setDetailsModalOpen} request={selectedRequest} />
+    <div>
+      <DeleteRequestAlert
+        open={deleteModalOpen}
+        onOpenChange={setDeleteModalOpen}
+        request={selectedRequest}
+      />
+      <TooltipProvider>
+        <div className="space-y-6">
+          <FlowRequestModal open={modalOpen} onOpenChange={setModalOpen} />
+          <RequestDetailsModal open={detailsModalOpen} onOpenChange={setDetailsModalOpen} request={selectedRequest} />
 
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-semibold text-foreground">
-              Solicitudes de Flujos
-            </h1>
-            <p className="text-muted-foreground mt-1">
-              Gestiona las solicitudes de flujos de documentos
-            </p>
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-2xl font-semibold text-foreground">
+                Solicitudes de Flujos
+              </h1>
+              <p className="text-muted-foreground mt-1">
+                Gestiona las solicitudes de flujos de documentos
+              </p>
+            </div>
+            <Button
+              onClick={() => setModalOpen(true)}
+              className="bg-primary hover:bg-primary/80 shadow-lg shadow-primary/25 transition-all duration-200"
+            >
+              <Plus className="w-4 h-4 mr-2" />
+              Nueva Solicitud
+            </Button>
           </div>
-          <Button
-            onClick={() => setModalOpen(true)}
-            className="bg-primary hover:bg-primary/80 shadow-lg shadow-primary/25 transition-all duration-200"
-          >
-            <Plus className="w-4 h-4 mr-2" />
-            Nueva Solicitud
-          </Button>
-        </div>
 
-        {/* Table */}
-        <div className="overflow-hidden rounded-xs">
-          <CardHeader className="py-3 bg-muted-foreground/5 rounded mt-2 rounded-t-lg border-t border-l border-r border-gray-200">
-            <CardTitle className="text-xl">Lista de Solicitudes</CardTitle>
-          </CardHeader>
-          <CardContent className="p-0 border border-gray-200">
-            <Table>
-              <TableHeader>
-                <TableRow className="hover:bg-transparent">
-                  <TableHead className="font-semibold pl-5">ID</TableHead>
-                  <TableHead className="font-semibold">
-                    Fecha Creación
-                  </TableHead>
-                  <TableHead className="font-semibold ">Tipo Doc.</TableHead>
-                  <TableHead className="font-semibold">Documento</TableHead>
-                  <TableHead className="font-semibold">Clave</TableHead>
-                  <TableHead className="font-semibold">URL Solicitud</TableHead>
-                  <TableHead className="font-semibold">Estado</TableHead>
-                  <TableHead className="font-semibold text-right">
-                    Acciones
-                  </TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {flowRequests.map((request, index) => (
-                  <TableRow
-                    key={request.id}
-                    className="hover:bg-primary/5 transition-colors duration-150"
-                    style={{ animationDelay: `${index * 50}ms` }}
-                  >
-                    <TableCell className="font-mono text-sm text-muted-foreground pl-5">
-                      {request.id}
-                    </TableCell>
-                    <TableCell className="text-muted-foreground">
-                      {request.createdAt}
-                    </TableCell>
-                    <TableCell>
-                      <Badge
-                        variant="secondary"
-                        className="bg-primary/10 text-primary"
-                      >
-                        {request.docType}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="font-medium">
-                      {request.document}
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-2">
-                        <code className="text-xs bg-muted px-2 py-1 rounded font-mono">
-                          {request.key}
-                        </code>
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="h-7 w-7 hover:bg-primary/10 hover:text-primary"
-                              onClick={() =>
-                                copyToClipboard(
-                                  request.key,
-                                  `key-${request.id}`,
-                                )
-                              }
-                            >
-                              {copiedId === `key-${request.id}` ? (
-                                <Check className="w-3 h-3 text-green-500" />
-                              ) : (
-                                <Copy className="w-3 h-3" />
-                              )}
-                            </Button>
-                          </TooltipTrigger>
-                          <TooltipContent>
-                            {copiedId === `key-${request.id}`
-                              ? "¡Copiado!"
-                              : "Copiar clave"}
-                          </TooltipContent>
-                        </Tooltip>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-2 max-w-[200px]">
-                        <span className="truncate text-xs text-muted-foreground">
-                          {request.url}
-                        </span>
-                        <div className="flex items-center gap-1">
+          {/* Table */}
+          <div className="overflow-hidden rounded-xs">
+            <CardHeader className="py-3 bg-muted-foreground/5 rounded mt-2 rounded-t-lg border-t border-l border-r border-gray-200">
+              <CardTitle className="text-xl">Lista de Solicitudes</CardTitle>
+            </CardHeader>
+            <CardContent className="p-0 border border-gray-200">
+              <Table>
+                <TableHeader>
+                  <TableRow className="hover:bg-transparent">
+                    <TableHead className="font-semibold pl-5">ID</TableHead>
+                    <TableHead className="font-semibold">
+                      Fecha Creación
+                    </TableHead>
+                    <TableHead className="font-semibold ">Tipo Doc.</TableHead>
+                    <TableHead className="font-semibold">Documento</TableHead>
+                    <TableHead className="font-semibold">Clave</TableHead>
+                    <TableHead className="font-semibold">URL Solicitud</TableHead>
+                    <TableHead className="font-semibold">Estado</TableHead>
+                    <TableHead className="font-semibold text-right">
+                      Acciones
+                    </TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {flowRequests.map((request, index) => (
+                    <TableRow
+                      key={request.id}
+                      className="hover:bg-primary/5 transition-colors duration-150"
+                      style={{ animationDelay: `${index * 50}ms` }}
+                    >
+                      <TableCell className="font-mono text-sm text-muted-foreground pl-5">
+                        {request.id}
+                      </TableCell>
+                      <TableCell className="text-muted-foreground">
+                        {request.createdAt}
+                      </TableCell>
+                      <TableCell>
+                        <Badge
+                          variant="secondary"
+                          className="bg-primary/10 text-primary"
+                        >
+                          {request.docType}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="font-medium">
+                        {request.document}
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-2">
+                          <code className="text-xs bg-muted px-2 py-1 rounded font-mono">
+                            {request.key}
+                          </code>
                           <Tooltip>
                             <TooltipTrigger asChild>
                               <Button
@@ -218,12 +197,12 @@ export function FlowRequestsPage() {
                                 className="h-7 w-7 hover:bg-primary/10 hover:text-primary"
                                 onClick={() =>
                                   copyToClipboard(
-                                    request.url,
-                                    `url-${request.id}`,
+                                    request.key,
+                                    `key-${request.id}`,
                                   )
                                 }
                               >
-                                {copiedId === `url-${request.id}` ? (
+                                {copiedId === `key-${request.id}` ? (
                                   <Check className="w-3 h-3 text-green-500" />
                                 ) : (
                                   <Copy className="w-3 h-3" />
@@ -231,68 +210,105 @@ export function FlowRequestsPage() {
                               </Button>
                             </TooltipTrigger>
                             <TooltipContent>
-                              {copiedId === `url-${request.id}`
+                              {copiedId === `key-${request.id}`
                                 ? "¡Copiado!"
-                                : "Copiar URL"}
+                                : "Copiar clave"}
                             </TooltipContent>
                           </Tooltip>
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                className="h-7 w-7 hover:bg-primary/10 hover:text-primary"
-                                onClick={() =>
-                                  window.open(request.url, "_blank")
-                                }
-                              >
-                                <ExternalLink className="w-3 h-3" />
-                              </Button>
-                            </TooltipTrigger>
-                            <TooltipContent>Abrir URL</TooltipContent>
-                          </Tooltip>
                         </div>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <Badge
-                        variant="secondary"
-                        className={
-                          statusStyles[
-                          request.status as keyof typeof statusStyles
-                          ]
-                        }
-                      >
-                        {request.status.charAt(0).toUpperCase() +
-                          request.status.slice(1)}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <div className="flex items-center justify-end gap-1">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-8 w-8 hover:bg-primary/10 hover:text-primary"
-                          onClick={() => handleViewDetails(request)}
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-2 max-w-[200px]">
+                          <span className="truncate text-xs text-muted-foreground">
+                            {request.url}
+                          </span>
+                          <div className="flex items-center gap-1">
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="h-7 w-7 hover:bg-primary/10 hover:text-primary"
+                                  onClick={() =>
+                                    copyToClipboard(
+                                      request.url,
+                                      `url-${request.id}`,
+                                    )
+                                  }
+                                >
+                                  {copiedId === `url-${request.id}` ? (
+                                    <Check className="w-3 h-3 text-green-500" />
+                                  ) : (
+                                    <Copy className="w-3 h-3" />
+                                  )}
+                                </Button>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                {copiedId === `url-${request.id}`
+                                  ? "¡Copiado!"
+                                  : "Copiar URL"}
+                              </TooltipContent>
+                            </Tooltip>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="h-7 w-7 hover:bg-primary/10 hover:text-primary"
+                                  onClick={() =>
+                                    window.open(request.url, "_blank")
+                                  }
+                                >
+                                  <ExternalLink className="w-3 h-3" />
+                                </Button>
+                              </TooltipTrigger>
+                              <TooltipContent>Abrir URL</TooltipContent>
+                            </Tooltip>
+                          </div>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <Badge
+                          variant="secondary"
+                          className={
+                            statusStyles[
+                            request.status as keyof typeof statusStyles
+                            ]
+                          }
                         >
-                          <Eye className="w-4 h-4" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-8 w-8 hover:bg-red-500/10 hover:text-red-600"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </CardContent>
+                          {request.status.charAt(0).toUpperCase() +
+                            request.status.slice(1)}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <div className="flex items-center justify-end gap-1">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8 hover:bg-primary/10 hover:text-primary"
+                            onClick={() => handleViewDetails(request)}
+                          >
+                            <Eye className="w-4 h-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8 hover:bg-red-500/10 hover:text-red-600"
+                            onClick={() => handleDelete(request)}
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </div>
         </div>
-      </div>
-    </TooltipProvider>
+      </TooltipProvider>
+    </div>
+
   );
 }

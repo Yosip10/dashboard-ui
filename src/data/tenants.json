@@ -1,0 +1,59 @@
+{
+    "comfandi": {
+        "id": "1",
+        "name": "Comfandi",
+        "description": "Comfandi",
+        "theme": {
+            "primary": "#05c3dd",
+            "secondary": "#0e4a67",
+            "accent": "#00e8ff",
+            "background": "#f0f9fb",
+            "foreground": "#082f49",
+            "cardBackground": "#ffffff",
+            "border": "#cffafe"
+        },
+        "logo": {
+            "width": "100px",
+            "height": "100px",
+            "url": "https://upload.wikimedia.org/wikipedia/commons/e/e3/Logo-Comfandi.png"
+        }
+    },
+    "tuya": {
+        "id": "2",
+        "name": "Tuya",
+        "description": "Tuya",
+        "theme": {
+            "primary": "#dc2626",
+            "secondary": "#be123c",
+            "accent": "#f43f5e",
+            "background": "#ffffff",
+            "foreground": "#7f1d1d",
+            "cardBackground": "#fef2f2",
+            "border": "#fecaca"
+        },
+        "logo": {
+            "width": "150px",
+            "height": "150px",
+            "url": "https://ciandco.edu.co/wp-content/uploads/2018/12/tuya.png"
+        }
+    },
+    "sura": {
+        "id": "3",
+        "name": "Sura",
+        "description": "Sura",
+        "theme": {
+            "primary": "#2d6df6",
+            "secondary": "#1e293b",
+            "accent": "#00d4ff",
+            "background": "#f8fafc",
+            "foreground": "#0f172a",
+            "cardBackground": "#ffffff",
+            "border": "#e2e8f0"
+        },
+        "logo": {
+            "width": "128px",
+            "height": "128px",
+            "url": "https://upload.wikimedia.org/wikipedia/commons/6/61/Seguros_SURA_Logo.svg"
+        }
+    }
+}

@@ -10,19 +10,23 @@ export const useUpdateUserMutation = () => {
     const accountId = user?.["x-accountId"] || "";
 
     return useMutation({
-        mutationFn: (data: UpdateUserRequest) => updateUserService(data, accountId),
+        mutationFn: async (data: UpdateUserRequest) => {
+            const response = await updateUserService(data, accountId);
+            if (response.error) throw response.error;
+            return response.data;
+        },
         onSuccess: (data) => {
-            if (data.success) {
+            if (data?.success) {
                 toast.success("Usuario actualizado exitosamente.");
                 queryClient.invalidateQueries({ queryKey: ["users"] });
             } else {
-                toast.error(typeof data.message === 'string' ? data.message : "Error al actualizar usuario");
+                toast.error(typeof data?.message === 'string' ? data.message : "Error al actualizar usuario");
             }
         },
         onError: (error: any) => {
             console.error("Update User Error:", error);
-            const errorMessage = error.response?.data?.message || "Error al conectar con el servidor";
-            toast.error(errorMessage);
+            toast.error(error.message || "Error al actualizar usuario");
         }
     });
 };
+

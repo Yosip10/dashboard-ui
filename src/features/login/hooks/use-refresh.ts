@@ -12,13 +12,14 @@ export const useRefreshMutation = () => {
                 throw new Error("Missing session information");
             }
 
-            const { data: refreshResult } = await refreshService(
-                user.refresh_token
-            );
-            return refreshResult;
+            const response = await refreshService(user.refresh_token);
+            if (response.error) throw response.error;
+            if (!response.data) throw new Error("Error al renovar la sesión");
+
+            return response.data;
         },
         onSuccess: (authData) => {
-            if (user) {
+            if (user && authData) {
                 setUser({
                     ...user,
                     access_token: authData.accessToken,
@@ -31,8 +32,9 @@ export const useRefreshMutation = () => {
         },
         onError: (error: any) => {
             console.error("Refresh Error:", error);
-            toast.error("Tu sesión ha expirado. Por favor, inicia sesión de nuevo.");
+            toast.error(error.message || "Tu sesión ha expirado. Por favor, inicia sesión de nuevo.");
             logout();
         }
     });
 };
+

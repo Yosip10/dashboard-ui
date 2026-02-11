@@ -27,12 +27,22 @@ export const useLoginMutation = (options: LoginOptions = { redirect: true }) => 
             const bodyLogin = { username, password };
 
             // 1. Sign in
-            const { data: authResult } = await signinService(bodyLogin, accountId);
-            const authData = authResult;
+            const signinResponse = await signinService(bodyLogin, accountId);
+            if (signinResponse.error) throw signinResponse.error;
+
+            const authData = signinResponse.data;
+            if (!authData) throw new Error("Error en la autenticación");
+
             // 2. Get user info
-            const { data: userData } = await getUserInformation("tuyaQA", authData.accessToken);
+            const userResponse = await getUserInformation("tuyaQA", authData.accessToken);
+            if (userResponse.error) throw userResponse.error;
+
+            const userData = userResponse.data;
+            if (!userData) throw new Error("Error al obtener información del usuario");
+
             return { authData, userData, accountId, username, rememberMe };
         },
+
         onSuccess: ({ authData, userData, accountId, username, rememberMe }) => {
             if (rememberMe) {
                 localStorage.setItem('remember', JSON.stringify({ username, accountId }));
@@ -65,7 +75,8 @@ export const useLoginMutation = (options: LoginOptions = { redirect: true }) => 
         },
         onError: (error: any) => {
             console.error("Login Error:", error);
-            toast.error("Credenciales invalidas.");
+            toast.error(error.message || "Credenciales invalidas.");
         }
+
     });
 };

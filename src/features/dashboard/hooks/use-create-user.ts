@@ -10,19 +10,23 @@ export const useCreateUserMutation = () => {
     const accountId = user?.["x-accountId"] || "";
 
     return useMutation({
-        mutationFn: (data: CreateUserRequest) => createUserService(data, accountId),
+        mutationFn: async (data: CreateUserRequest) => {
+            const response = await createUserService(data, accountId);
+            if (response.error) throw response.error;
+            return response.data;
+        },
         onSuccess: (data) => {
-            if (data.success) {
+            if (data?.success) {
                 toast.success("Usuario creado exitosamente.");
                 queryClient.invalidateQueries({ queryKey: ["users"] });
             } else {
-                toast.error(typeof data.message === 'string' ? data.message : "Error al crear usuario");
+                toast.error(typeof data?.message === 'string' ? data.message : "Error al crear usuario");
             }
         },
         onError: (error: any) => {
             console.error("Create User Error:", error);
-            const errorMessage = error.response?.data?.message || "Error al conectar con el servidor";
-            toast.error(errorMessage);
+            toast.error(error.message || "Error al crear usuario");
         }
     });
 };
+

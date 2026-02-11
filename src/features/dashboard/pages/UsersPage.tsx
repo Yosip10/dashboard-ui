@@ -135,7 +135,7 @@ export function UsersPage() {
                     key={user.id}
                     className="hover:bg-primary/5 transition-colors duration-150 border-gray-200"
                   >
-                    <TableCell className="text-xs text-muted-foreground max-w-[100px] truncate pl-5">
+                    <TableCell className="text-xs text-muted-foreground max-w-25 truncate pl-5">
                       {user.username}
                     </TableCell>
                     <TableCell>
@@ -203,6 +203,7 @@ export function UsersPage() {
                 ))}
               </TableBody>
             </Table>
+
           </div>
         </CardContent>
       </div>

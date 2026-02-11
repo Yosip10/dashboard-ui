@@ -9,19 +9,23 @@ export const useDeleteUserMutation = () => {
     const accountId = user?.["x-accountId"] || "";
 
     return useMutation({
-        mutationFn: (userId: string) => deleteUserService(userId, accountId),
+        mutationFn: async (userId: string) => {
+            const response = await deleteUserService(userId, accountId);
+            if (response.error) throw response.error;
+            return response.data;
+        },
         onSuccess: (data) => {
-            if (data.success) {
+            if (data?.success) {
                 toast.success("Usuario eliminado exitosamente.");
                 queryClient.invalidateQueries({ queryKey: ["users"] });
             } else {
-                toast.error(typeof data.message === 'string' ? data.message : "Error al eliminar usuario");
+                toast.error(typeof data?.message === 'string' ? data.message : "Error al eliminar usuario");
             }
         },
         onError: (error: any) => {
             console.error("Delete User Error:", error);
-            const errorMessage = error.response?.data?.message || "Error al conectar con el servidor";
-            toast.error(errorMessage);
+            toast.error(error.message || "Error al eliminar usuario");
         }
     });
 };
+

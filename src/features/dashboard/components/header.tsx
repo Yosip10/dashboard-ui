@@ -27,7 +27,7 @@ export function Header({ onMenuClick }: HeaderProps) {
                 </Button>
             </div>
             {/* Search */}
-            <div className="relative w-80">
+            <div className="relative w-full">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                 <Input
                     placeholder="Buscar..."
@@ -36,7 +36,7 @@ export function Header({ onMenuClick }: HeaderProps) {
             </div>
 
             {/* Actions */}
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 ml-3">
                 <Button
                     variant="ghost"
                     size="icon"
@@ -54,12 +54,12 @@ export function Header({ onMenuClick }: HeaderProps) {
                 </Button>
                 <div className="w-px h-8 bg-border mx-2" />
                 <div className="flex items-center gap-3">
-                    <span className="text-sm font-medium text-muted-foreground hidden md:block">
+                    <span className="text-sm font-medium text-muted-foreground hidden md:block w-full max-w-52 truncate">
                         {user?.name}
                     </span>
                     <Avatar className="w-9 h-9 ring-2 ring-primary/20 transition-all duration-200 hover:ring-primary/40">
                         <AvatarImage src={user?.picture || "/placeholder.svg?height=36&width=36"} />
-                        <AvatarFallback className="bg-gradient-to-br from-primary/80 to-primary/60 text-white text-sm">
+                        <AvatarFallback className="bg-linear-to-br from-primary/80 to-primary/60 text-white text-sm">
                             {userInitial}
                         </AvatarFallback>
                     </Avatar>

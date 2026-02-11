@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 import { useAuthStore } from "@/features/login/store/auth.store";
 import { Navigate, Outlet, useParams } from "react-router";
-import { fetchTenantConfig, type TenantConfig } from "@/shared/services/tenant.service";
+import { fetchTenantConfig } from "@/shared/services/tenant.service";
 import { TenantContext } from "@/shared/context/TenantContext";
 import { Loader, SessionMonitor } from "@/shared/components";
+import type { TenantConfig } from "@/shared/lib/mock-tenants";
 
 export const TenantGuard = () => {
     const { tenant } = useParams();
@@ -31,13 +32,14 @@ export const TenantGuard = () => {
                     if (cachedConfigStr) {
                         const cachedConfig = JSON.parse(cachedConfigStr) as TenantConfig;
                         // Si la configuración en caché coincide con el inquilino solicitado -> Usarla
-                        if (cachedConfig.id.toLowerCase() === tenantId.toLowerCase()) {
+                        if (cachedConfig.name.toLowerCase() === tenantId.toLowerCase()) {
                             setCurrentTenant(cachedConfig);
                             setLoading(false);
                             return;
+                        } else {
+                            logout();
                         }
 
-                        logout();
                     }
 
                     // 3. Obtener de API (Mock)

@@ -203,7 +203,7 @@ export function FlowRequestsPage() {
                                 }
                               >
                                 {copiedId === `key-${request.id}` ? (
-                                  <Check className="w-3 h-3 text-green-500" />
+                                  <Check className="w-3 h-3 text-primary" />
                                 ) : (
                                   <Copy className="w-3 h-3" />
                                 )}
@@ -218,7 +218,7 @@ export function FlowRequestsPage() {
                         </div>
                       </TableCell>
                       <TableCell>
-                        <div className="flex items-center gap-2 max-w-[200px]">
+                        <div className="flex items-center gap-2 max-w-50">
                           <span className="truncate text-xs text-muted-foreground">
                             {request.url}
                           </span>
@@ -237,7 +237,7 @@ export function FlowRequestsPage() {
                                   }
                                 >
                                   {copiedId === `url-${request.id}` ? (
-                                    <Check className="w-3 h-3 text-green-500" />
+                                    <Check className="w-3 h-3 text-primary" />
                                   ) : (
                                     <Copy className="w-3 h-3" />
                                   )}

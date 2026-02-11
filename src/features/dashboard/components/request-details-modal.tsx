@@ -122,7 +122,7 @@ export function RequestDetailsModal({
                                                     variant="outline"
                                                     size="icon"
                                                     onClick={() => copyToClipboard(request.key, "key")}
-                                                    className="h-8 w-8 hover:text-white"
+                                                    className="h-8 w-8 hover:text-white hover:bg-primary"
                                                 >
                                                     {copiedId === "key" ? (
                                                         <Check className="w-4 h-4" />
@@ -154,7 +154,7 @@ export function RequestDetailsModal({
                                                         variant="outline"
                                                         size="icon"
                                                         onClick={() => copyToClipboard(request.url, "url")}
-                                                        className="h-8 w-8 hover:text-white"
+                                                        className="h-8 w-8 hover:text-white hover:bg-primary"
                                                     >
                                                         {copiedId === "url" ? (
                                                             <Check className="w-4 h-4" />
@@ -173,7 +173,7 @@ export function RequestDetailsModal({
                                                         variant="outline"
                                                         size="icon"
                                                         onClick={() => window.open(request.url, "_blank")}
-                                                        className="h-8 w-8 hover:text-white"
+                                                        className="h-8 w-8 hover:text-white hover:bg-primary"
                                                     >
                                                         <ExternalLink className="w-4 h-4" />
                                                     </Button>

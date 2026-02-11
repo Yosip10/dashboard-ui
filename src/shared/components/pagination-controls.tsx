@@ -38,9 +38,10 @@ export function PaginationControls({
                     {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => (
                         <PaginationItem key={pageNum}>
                             <PaginationLink
+
                                 onClick={() => onPageChange(pageNum)}
                                 isActive={currentPage === pageNum}
-                                className="cursor-pointer bg-primary hover:bg-primary/80 text-white hover:text-white"
+                                className={`cursor-pointer bg-gray-200 hover:bg-gray-300 text-gray-800 hover:text-gray-800 active:bg-gray-300 ${currentPage === pageNum ? "bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground" : ""}`}
                             >
                                 {pageNum}
                             </PaginationLink>

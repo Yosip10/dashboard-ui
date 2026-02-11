@@ -17,9 +17,22 @@ import { UserDetailsModal } from "../components/user-details-modal";
 import { CreateUserModal } from "../components/create-user-modal";
 import { DeleteUserAlert } from "../components/delete-user-alert";
 import { useUsers } from "../hooks/use-users";
+import {
+  PaginationControls
+} from "@/shared/components/pagination-controls";
+import { MOCK_USERS } from "../data/mock-users";
+
 
 export function UsersPage() {
-  const { data: response, isLoading, isError } = useUsers();
+  const [page, setPage] = useState(1);
+  const pageSize = 10;
+  const [isSimulatingLoading, setIsSimulatingLoading] = useState(false);
+
+  const { data: response, isLoading, isError } = useUsers({
+    limit: pageSize,
+    skip: (page - 1) * pageSize
+  }, true); // Enabled mock for simulation
+
   const [modalOpen, setModalOpen] = useState(false);
   const [detailsOpen, setDetailsOpen] = useState(false);
   const [createModalOpen, setCreateModalOpen] = useState(false);
@@ -27,6 +40,20 @@ export function UsersPage() {
   const [selectedUser, setSelectedUser] = useState<any>(null);
 
   const usersData = response?.data?.users || [];
+  const totalUsers = MOCK_USERS.length;
+  const totalPages = Math.ceil(totalUsers / pageSize);
+
+  const handlePageChange = (newPage: number) => {
+    if (newPage >= 1 && newPage <= totalPages) {
+      setIsSimulatingLoading(true);
+      setTimeout(() => {
+        setPage(newPage);
+        setIsSimulatingLoading(false);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }, 800);
+    }
+  };
+
 
   const handleEdit = (user: any) => {
     setSelectedUser(user);
@@ -110,7 +137,14 @@ export function UsersPage() {
 
 
       {/* Table */}
-      <div className="overflow-hidden rounded-xs">
+      <div className="overflow-hidden rounded-xs relative">
+        {isSimulatingLoading && (
+          <div className="absolute inset-0 bg-background/50 backdrop-blur-[1px] z-10 flex items-center justify-center rounded-lg">
+            <div className="bg-background p-4 rounded-full shadow-lg border border-primary/20">
+              <Loader2 className="w-8 h-8 animate-spin text-primary" />
+            </div>
+          </div>
+        )}
         <CardHeader className="py-3 bg-muted-foreground/5 rounded mt-2 rounded-t-lg border-t border-l border-r border-gray-200">
           <CardTitle className="text-xl">Lista de Usuarios</CardTitle>
         </CardHeader>
@@ -203,11 +237,19 @@ export function UsersPage() {
                 ))}
               </TableBody>
             </Table>
-
           </div>
         </CardContent>
+
+        <PaginationControls
+          currentPage={page}
+          totalPages={totalPages}
+          totalItems={totalUsers}
+          itemsPerPage={pageSize}
+          onPageChange={handlePageChange}
+        />
       </div>
     </div>
   );
 }
+
 

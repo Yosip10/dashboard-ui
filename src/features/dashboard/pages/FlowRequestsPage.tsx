@@ -29,54 +29,9 @@ import {
 import { FlowRequestModal } from "../components/flow-request-modal";
 import { RequestDetailsModal } from "../components/request-details-modal";
 import DeleteRequestAlert from "../components/delete-request-alert";
-
-const flowRequests = [
-  {
-    id: "FLW001",
-    createdAt: "2025-01-15 09:30",
-    docType: "Factura",
-    document: "FAC-2025-0001",
-    key: "abc123xyz",
-    url: "https://api.example.com/flow/abc123xyz",
-    status: "activo",
-  },
-  {
-    id: "FLW002",
-    createdAt: "2025-01-14 14:22",
-    docType: "Orden de Compra",
-    document: "OC-2025-0042",
-    key: "def456uvw",
-    url: "https://api.example.com/flow/def456uvw",
-    status: "pendiente",
-  },
-  {
-    id: "FLW003",
-    createdAt: "2025-01-13 11:45",
-    docType: "Nota de Crédito",
-    document: "NC-2025-0015",
-    key: "ghi789rst",
-    url: "https://api.example.com/flow/ghi789rst",
-    status: "rechazado",
-  },
-  {
-    id: "FLW004",
-    createdAt: "2025-01-12 16:30",
-    docType: "Factura",
-    document: "FAC-2025-0002",
-    key: "jkl012opq",
-    url: "https://api.example.com/flow/jkl012opq",
-    status: "activo",
-  },
-  {
-    id: "FLW005",
-    createdAt: "2025-01-11 10:15",
-    docType: "Orden de Compra",
-    document: "OC-2025-0043",
-    key: "mno345lmn",
-    url: "https://api.example.com/flow/mno345lmn",
-    status: "pendiente",
-  },
-];
+import { PaginationControls } from "@/shared/components/pagination-controls";
+import { Loader2 } from "lucide-react";
+import { MOCK_REQUESTS } from "../data/mock-request";
 
 const statusStyles = {
   activo: "bg-green-500/10 text-green-600 hover:bg-green-500/20",
@@ -85,13 +40,31 @@ const statusStyles = {
 };
 
 export function FlowRequestsPage() {
+  const [page, setPage] = useState(1);
+  const pageSize = 10;
+  const [isSimulatingLoading, setIsSimulatingLoading] = useState(false);
+
+  const totalPages = Math.ceil(MOCK_REQUESTS.length / pageSize);
+  const paginatedRequests = MOCK_REQUESTS.slice((page - 1) * pageSize, page * pageSize);
+
+  const handlePageChange = (newPage: number) => {
+    if (newPage >= 1 && newPage <= totalPages) {
+      setIsSimulatingLoading(true);
+      setTimeout(() => {
+        setPage(newPage);
+        setIsSimulatingLoading(false);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }, 800);
+    }
+  };
+
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [detailsModalOpen, setDetailsModalOpen] = useState(false);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
-  const [selectedRequest, setSelectedRequest] = useState<(typeof flowRequests)[0] | null>(null);
+  const [selectedRequest, setSelectedRequest] = useState<(typeof MOCK_REQUESTS)[0] | null>(null);
 
-  const handleViewDetails = (request: (typeof flowRequests)[0]) => {
+  const handleViewDetails = (request: (typeof MOCK_REQUESTS)[0]) => {
     setSelectedRequest(request);
     setDetailsModalOpen(true);
   };
@@ -102,7 +75,7 @@ export function FlowRequestsPage() {
     setTimeout(() => setCopiedId(null), 2000);
   };
 
-  const handleDelete = (request: (typeof flowRequests)[0]) => {
+  const handleDelete = (request: (typeof MOCK_REQUESTS)[0]) => {
     setSelectedRequest(request);
     setDeleteModalOpen(true);
   };
@@ -138,7 +111,14 @@ export function FlowRequestsPage() {
           </div>
 
           {/* Table */}
-          <div className="overflow-hidden rounded-xs">
+          <div className="overflow-hidden rounded-xs relative">
+            {isSimulatingLoading && (
+              <div className="absolute inset-0 bg-background/50 backdrop-blur-[1px] z-10 flex items-center justify-center rounded-lg">
+                <div className="bg-background p-4 rounded-full shadow-lg border border-primary/20">
+                  <Loader2 className="w-8 h-8 animate-spin text-primary" />
+                </div>
+              </div>
+            )}
             <CardHeader className="py-3 bg-muted-foreground/5 rounded mt-2 rounded-t-lg border-t border-l border-r border-gray-200">
               <CardTitle className="text-xl">Lista de Solicitudes</CardTitle>
             </CardHeader>
@@ -161,7 +141,7 @@ export function FlowRequestsPage() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {flowRequests.map((request, index) => (
+                  {paginatedRequests.map((request, index) => (
                     <TableRow
                       key={request.id}
                       className="hover:bg-primary/5 transition-colors duration-150"
@@ -305,6 +285,13 @@ export function FlowRequestsPage() {
                 </TableBody>
               </Table>
             </CardContent>
+            <PaginationControls
+              currentPage={page}
+              totalPages={totalPages}
+              totalItems={MOCK_REQUESTS.length}
+              itemsPerPage={pageSize}
+              onPageChange={handlePageChange}
+            />
           </div>
         </div>
       </TooltipProvider>

@@ -1,14 +1,14 @@
 import axios, { AxiosError } from "axios";
 import type { ApiError } from "./types";
 
-// Create a centralized axios instance
+// Crear una instancia centralizada de axios
 const apiClient = axios.create();
 
-// Request interceptor to add the Authorization header
+// Interceptor de solicitud para agregar el encabezado de autorización
 apiClient.interceptors.request.use(
     (config) => {
         try {
-            // Get the auth storage from localStorage (Zustand persists it there)
+            // Obtener el almacenamiento de autenticación de localStorage (Zustand lo persiste ahí)
             const storage = localStorage.getItem("auth-storage");
             if (storage) {
                 const { state } = JSON.parse(storage);
@@ -28,7 +28,7 @@ apiClient.interceptors.request.use(
     }
 );
 
-// Response interceptor to handle errors globally
+// Interceptor de respuesta para manejar errores globalmente
 apiClient.interceptors.response.use(
     (response) => {
         return response;
@@ -40,7 +40,7 @@ apiClient.interceptors.response.use(
         };
 
         if (error.response) {
-            // Server responded with a status code outside the 2xx range
+            // El servidor respondió con un código de estado fuera del rango 2xx
             const status = error.response.status;
             const data = error.response.data;
 
@@ -48,7 +48,7 @@ apiClient.interceptors.response.use(
             apiError.code = data?.code || data?.statusCode;
             apiError.details = data;
 
-            // Map standard HTTP status codes to user-friendly messages
+            // Asignar mensajes estándar de HTTP a mensajes amigables para el usuario
             const httpMessages: Record<number, string> = {
                 400: "Solicitud incorrecta. Por favor, verifica los datos.",
                 401: "No autorizado. Su sesión puede haber expirado.",
@@ -61,14 +61,14 @@ apiClient.interceptors.response.use(
                 504: "Tiempo de espera agotado.",
             };
 
-            // Priority: 1. Server message, 2. Standard HTTP message, 3. Default error message
+            // Prioridad: 1. Mensaje del servidor, 2. Mensaje estándar de HTTP, 3. Mensaje de error predeterminado
             apiError.message = data?.message || data?.error || httpMessages[status] || error.message;
 
-            // Special handling for common business codes
+            // Manejo especial para códigos de negocio comunes
             if (apiError.code === "TOKEN_EXPIRED" || apiError.code === "40001") {
                 apiError.message = "Su sesión ha expirado. Por favor, inicie sesión nuevamente.";
             } else if (status === 401) {
-                // If it's a login request, 401 means invalid credentials
+                // Si es una solicitud de inicio de sesión, 401 significa credenciales inválidas
                 const isLoginRequest = error.config?.url?.includes('/auth/token');
                 if (isLoginRequest) {
                     apiError.message = "Credenciales inválidas. Por favor, verifica tu usuario y contraseña.";
@@ -78,11 +78,11 @@ apiClient.interceptors.response.use(
             }
 
         } else if (error.request) {
-            // Request was made but no response received
+            // Se hizo una solicitud pero no se recibió una respuesta
             apiError.message = "No se pudo conectar con el servidor. Por favor, revisa tu conexión.";
             apiError.code = "NETWORK_ERROR";
         } else {
-            // Something happened in setting up the request that triggered an Error
+            // Algo sucedió al configurar la solicitud que generó un Error
             apiError.message = error.message;
         }
 

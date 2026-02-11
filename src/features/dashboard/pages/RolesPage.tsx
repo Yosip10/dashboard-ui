@@ -23,62 +23,45 @@ import {
 import { RoleModal } from "../components/role-modal";
 import { RoleDetailsModal } from "../components/role-details-modal";
 import DeleteRolesAlert from "../components/delete-roles-alert";
+import { PaginationControls } from "@/shared/components/pagination-controls";
+import { Loader2 } from "lucide-react";
+import { MOCK_ROLES } from "../data/mock-roles";
 
-const roles = [
-  {
-    id: "ROL001",
-    name: "Administrador",
-    users: [
-      { initials: "JS", color: "bg-blue-500" },
-      { initials: "PM", color: "bg-purple-500" },
-    ],
-    modules: ["Usuarios", "Roles", "Configuración", "Reportes", "Logs", "Auditoría", "Contenido", "Medios", "Publicaciones", "Dashboard"],
-    active: true,
-  },
-  {
-    id: "ROL002",
-    name: "Editor",
-    users: [
-      { initials: "MG", color: "bg-green-500" },
-      { initials: "RR", color: "bg-orange-500" },
-    ],
-    modules: ["Contenido", "Medios", "Publicaciones", "Dashboard", "Reportes"],
-    active: true,
-  },
-  {
-    id: "ROL003",
-    name: "Viewer",
-    users: [
-      { initials: "AL", color: "bg-pink-500" },
-      { initials: "CF", color: "bg-teal-500" },
-    ],
-    modules: ["Dashboard", "Reportes"],
-    active: true,
-  },
-  {
-    id: "ROL004",
-    name: "Auditor",
-    users: [{ initials: "JD", color: "bg-indigo-500" }],
-    modules: ["Logs", "Auditoría", "Reportes"],
-    active: false,
-  },
-];
+
 
 export function RolesPage() {
+  const [page, setPage] = useState(1);
+  const pageSize = 10;
+  const [isSimulatingLoading, setIsSimulatingLoading] = useState(false);
+
+  const totalPages = Math.ceil(MOCK_ROLES.length / pageSize);
+  const paginatedRoles = MOCK_ROLES.slice((page - 1) * pageSize, page * pageSize);
+
+  const handlePageChange = (newPage: number) => {
+    if (newPage >= 1 && newPage <= totalPages) {
+      setIsSimulatingLoading(true);
+      setTimeout(() => {
+        setPage(newPage);
+        setIsSimulatingLoading(false);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }, 800);
+    }
+  };
+
   const [modalOpen, setModalOpen] = useState(false);
-  const [selectedRole, setSelectedRole] = useState<(typeof roles)[0] | null>(
+  const [selectedRole, setSelectedRole] = useState<(typeof MOCK_ROLES)[0] | null>(
     null,
   );
   const [detailsModalOpen, setDetailsModalOpen] = useState(false);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
-  const [viewRole, setViewRole] = useState<(typeof roles)[0] | null>(null);
+  const [viewRole, setViewRole] = useState<(typeof MOCK_ROLES)[0] | null>(null);
 
-  const handleViewDetails = (role: (typeof roles)[0]) => {
+  const handleViewDetails = (role: (typeof MOCK_ROLES)[0]) => {
     setViewRole(role);
     setDetailsModalOpen(true);
   };
 
-  const handleEdit = (role: (typeof roles)[0]) => {
+  const handleEdit = (role: (typeof MOCK_ROLES)[0]) => {
     setSelectedRole(role);
     setModalOpen(true);
   };
@@ -88,7 +71,7 @@ export function RolesPage() {
     setModalOpen(true);
   };
 
-  const handleDelete = (role: (typeof roles)[0]) => {
+  const handleDelete = (role: (typeof MOCK_ROLES)[0]) => {
     setSelectedRole(role);
     setDeleteModalOpen(true);
   };
@@ -131,7 +114,14 @@ export function RolesPage() {
 
 
       {/* Table */}
-      <div className="overflow-hidden rounded-xs">
+      <div className="overflow-hidden rounded-xs relative">
+        {isSimulatingLoading && (
+          <div className="absolute inset-0 bg-background/50 backdrop-blur-[1px] z-10 flex items-center justify-center rounded-lg">
+            <div className="bg-background p-4 rounded-full shadow-lg border border-primary/20">
+              <Loader2 className="w-8 h-8 animate-spin text-primary" />
+            </div>
+          </div>
+        )}
         <CardHeader className="py-3 bg-muted-foreground/5 rounded mt-2 rounded-t-lg border-t border-l border-r border-gray-200">
           <CardTitle className="text-xl">Lista de Roles</CardTitle>
         </CardHeader>
@@ -151,7 +141,7 @@ export function RolesPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {roles.map((role, index) => (
+                {paginatedRoles.map((role, index) => (
                   <TableRow
                     key={role.id}
                     className="hover:bg-primary/5 transition-colors duration-150"
@@ -251,6 +241,13 @@ export function RolesPage() {
           </div>
 
         </CardContent>
+        <PaginationControls
+          currentPage={page}
+          totalPages={totalPages}
+          totalItems={MOCK_ROLES.length}
+          itemsPerPage={pageSize}
+          onPageChange={handlePageChange}
+        />
       </div>
 
     </div>

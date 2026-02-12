@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { deleteUserService } from "../api/users.service";
 import { toast } from "sonner";
 import { useAuthStore } from "@/features/login/store/auth.store";
+import { deleteUserService } from "../services/delete-user.service";
 
 export const useDeleteUserMutation = () => {
     const queryClient = useQueryClient();

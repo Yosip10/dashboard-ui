@@ -1,8 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
-import { getUsersService } from "../api/users.service";
-import type { ListUsersPayload } from "../types/users";
 import { toast } from "sonner";
 import { useAuthStore } from "@/features/login/store/auth.store";
+import type { ListUsersPayload } from "../types/users";
+import { getUsersService } from "../services/get-users.service";
 
 export const useUsers = (params: ListUsersPayload = {}, useMock = false) => {
     const { user } = useAuthStore();

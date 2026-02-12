@@ -1,8 +1,8 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { createUserService } from "../api/users.service";
 import { toast } from "sonner";
 import type { CreateUserRequest } from "../types/users";
 import { useAuthStore } from "@/features/login/store/auth.store";
+import { createUserService } from "../services/create-user.service";
 
 export const useCreateUserMutation = () => {
     const queryClient = useQueryClient();

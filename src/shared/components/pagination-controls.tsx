@@ -18,8 +18,6 @@ interface PaginationControlsProps {
 export function PaginationControls({
     currentPage,
     totalPages,
-    totalItems,
-    itemsPerPage,
     onPageChange,
 }: PaginationControlsProps) {
     if (totalPages <= 1) return null;
@@ -41,7 +39,7 @@ export function PaginationControls({
 
                                 onClick={() => onPageChange(pageNum)}
                                 isActive={currentPage === pageNum}
-                                className={`cursor-pointer bg-gray-200 hover:bg-gray-300 text-gray-800 hover:text-gray-800 active:bg-gray-300 ${currentPage === pageNum ? "bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground" : ""}`}
+                                className={`cursor-pointer bg-gray-100 hover:bg-gray-300 text-gray-800 hover:text-gray-800 active:bg-gray-300 ${currentPage === pageNum ? "bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground" : ""}`}
                             >
                                 {pageNum}
                             </PaginationLink>
@@ -56,9 +54,9 @@ export function PaginationControls({
                     </PaginationItem>
                 </PaginationContent>
             </Pagination>
-            <div className="text-center mt-2 text-xs text-muted-foreground">
+            {/*  <div className="text-center mt-2 text-xs text-muted-foreground">
                 Mostrando {Math.min(itemsPerPage, totalItems)} de {totalItems} resultados
-            </div>
+            </div> */}
         </div>
     );
 }

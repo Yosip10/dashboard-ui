@@ -61,10 +61,14 @@ export interface ListUsersResponse {
 
 export interface ListUsersPayload {
     attributesToGet?: string;
+    search?: string;
+    column?: string;
     filter?: string;
     limit?: number;
     skip?: number;
 }
+
+export type UserColumn = "username" | "email" | "firstName" | "lastName";
 
 export interface UserCredential {
     type: string;

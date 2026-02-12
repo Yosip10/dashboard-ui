@@ -30,8 +30,10 @@ import { FlowRequestModal } from "../components/flow-request-modal";
 import { RequestDetailsModal } from "../components/request-details-modal";
 import DeleteRequestAlert from "../components/delete-request-alert";
 import { PaginationControls } from "@/shared/components/pagination-controls";
-import { Loader2 } from "lucide-react";
+import { Loader2, X } from "lucide-react";
 import { MOCK_REQUESTS } from "../data/mock-request";
+import { useRequests } from "../hooks/use-requests";
+import { useSearch } from "@/shared/hooks";
 
 const statusStyles = {
   activo: "bg-green-500/10 text-green-600 hover:bg-green-500/20",
@@ -43,9 +45,17 @@ export function FlowRequestsPage() {
   const [page, setPage] = useState(1);
   const pageSize = 10;
   const [isSimulatingLoading, setIsSimulatingLoading] = useState(false);
+  const { search, column } = useSearch();
 
+  const { data: response, isLoading, isError } = useRequests({
+    limit: pageSize,
+    skip: (page - 1) * pageSize,
+    search,
+    column
+  }, true);
+
+  const requestsData = response?.data?.requests || [];
   const totalPages = Math.ceil(MOCK_REQUESTS.length / pageSize);
-  const paginatedRequests = MOCK_REQUESTS.slice((page - 1) * pageSize, page * pageSize);
 
   const handlePageChange = (newPage: number) => {
     if (newPage >= 1 && newPage <= totalPages) {
@@ -79,6 +89,24 @@ export function FlowRequestsPage() {
     setSelectedRequest(request);
     setDeleteModalOpen(true);
   };
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+        <span className="ml-2 text-muted-foreground">Cargando solicitudes...</span>
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <div className="flex items-center justify-center h-64 text-red-500">
+        <X className="w-8 h-8 mr-2" />
+        <span>Error al cargar las solicitudes.</span>
+      </div>
+    );
+  }
 
   return (
     <div>
@@ -141,7 +169,7 @@ export function FlowRequestsPage() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {paginatedRequests.map((request, index) => (
+                  {requestsData.length ? requestsData.map((request, index) => (
                     <TableRow
                       key={request.id}
                       className="hover:bg-primary/5 transition-colors duration-150"
@@ -281,7 +309,13 @@ export function FlowRequestsPage() {
                         </div>
                       </TableCell>
                     </TableRow>
-                  ))}
+                  )) : (
+                    <TableRow>
+                      <TableCell colSpan={8} className="h-24 text-center">
+                        No se encontraron solicitudes
+                      </TableCell>
+                    </TableRow>
+                  )}
                 </TableBody>
               </Table>
             </CardContent>

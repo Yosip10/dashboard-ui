@@ -1,5 +1,3 @@
-"use client";
-
 import { useState } from "react";
 import { Eye, Pencil, Trash2, Plus } from "lucide-react";
 import { CardContent, CardHeader, CardTitle } from "@/shared/ui/card";
@@ -24,18 +22,27 @@ import { RoleModal } from "../components/role-modal";
 import { RoleDetailsModal } from "../components/role-details-modal";
 import DeleteRolesAlert from "../components/delete-roles-alert";
 import { PaginationControls } from "@/shared/components/pagination-controls";
-import { Loader2 } from "lucide-react";
+import { Loader2, X } from "lucide-react";
 import { MOCK_ROLES } from "../data/mock-roles";
-
-
+import { useRoles } from "../hooks/use-roles";
+import { useSearch } from "@/shared/hooks";
 
 export function RolesPage() {
   const [page, setPage] = useState(1);
   const pageSize = 10;
   const [isSimulatingLoading, setIsSimulatingLoading] = useState(false);
+  const { search, column } = useSearch();
 
-  const totalPages = Math.ceil(MOCK_ROLES.length / pageSize);
-  const paginatedRoles = MOCK_ROLES.slice((page - 1) * pageSize, page * pageSize);
+  const { data: response, isLoading, isError } = useRoles({
+    limit: pageSize,
+    skip: (page - 1) * pageSize,
+    search,
+    column
+  }, true);
+
+  const rolesData = response?.data?.roles || [];
+  const totalRoles = MOCK_ROLES.length;
+  const totalPages = Math.ceil(totalRoles / pageSize);
 
   const handlePageChange = (newPage: number) => {
     if (newPage >= 1 && newPage <= totalPages) {
@@ -75,6 +82,24 @@ export function RolesPage() {
     setSelectedRole(role);
     setDeleteModalOpen(true);
   };
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+        <span className="ml-2 text-muted-foreground">Cargando roles...</span>
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <div className="flex items-center justify-center h-64 text-red-500">
+        <X className="w-8 h-8 mr-2" />
+        <span>Error al cargar los roles.</span>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -141,7 +166,7 @@ export function RolesPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {paginatedRoles.map((role, index) => (
+                {rolesData.length ? rolesData.map((role, index) => (
                   <TableRow
                     key={role.id}
                     className="hover:bg-primary/5 transition-colors duration-150"
@@ -234,17 +259,24 @@ export function RolesPage() {
                       </div>
                     </TableCell>
                   </TableRow>
-                ))}
+                )) : (
+                  <TableRow>
+                    <TableCell colSpan={6} className="h-24 text-center">
+                      No se encontraron roles
+                    </TableCell>
+                  </TableRow>
+                )}
               </TableBody>
             </Table>
 
           </div>
 
         </CardContent>
+
         <PaginationControls
           currentPage={page}
           totalPages={totalPages}
-          totalItems={MOCK_ROLES.length}
+          totalItems={totalRoles}
           itemsPerPage={pageSize}
           onPageChange={handlePageChange}
         />

@@ -1,6 +1,6 @@
 import type { ApiResponse } from "@/shared/api/types";
 import { MOCK_USERS } from "../data/mock-users";
-import type { ListUsersPayload, ListUsersResponse } from "../types/users";
+import type { ListUsersPayload, ListUsersResponse, UserColumn } from "../types/users";
 import apiClient from "@/shared/api/api-client";
 
 const API_URL = import.meta.env.VITE_HOST_API_INFO;
@@ -12,12 +12,14 @@ const DEFAULT_PAYLOAD: ListUsersPayload = {
 };
 
 
-export const getUsersService = async (accountId: string, payload: ListUsersPayload = {}, useMock = false): Promise<ApiResponse<ListUsersResponse>> => {
+export const getUsersService = async (accountId: string, payload: ListUsersPayload, useMock = false): Promise<ApiResponse<ListUsersResponse>> => {
     if (useMock) {
+        console.log(payload.column);
         // Simulate pagination for mock data
         const limit = payload.limit || 10;
         const skip = payload.skip || 0;
         const paginatedUsers = MOCK_USERS.slice(skip, skip + limit);
+        const resultRearch = paginatedUsers.filter((user) => user[payload?.column as UserColumn || "id"].toLowerCase().includes(payload.search?.toLowerCase() || ""));
 
         return {
             data: {
@@ -25,7 +27,7 @@ export const getUsersService = async (accountId: string, payload: ListUsersPaylo
                 message: "Mock users loaded successfully",
                 StatusCode: "200",
                 data: {
-                    users: paginatedUsers
+                    users: resultRearch
                 }
             },
             error: null

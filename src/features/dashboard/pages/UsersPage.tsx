@@ -21,17 +21,21 @@ import {
   PaginationControls
 } from "@/shared/components/pagination-controls";
 import { MOCK_USERS } from "../data/mock-users";
+import { useSearch } from "@/shared/hooks";
 
 
 export function UsersPage() {
   const [page, setPage] = useState(1);
   const pageSize = 10;
   const [isSimulatingLoading, setIsSimulatingLoading] = useState(false);
+  const { search, column } = useSearch();
 
   const { data: response, isLoading, isError } = useUsers({
     limit: pageSize,
-    skip: (page - 1) * pageSize
-  }, true); // Enabled mock for simulation
+    skip: (page - 1) * pageSize,
+    search,
+    column
+  }, true);
 
   const [modalOpen, setModalOpen] = useState(false);
   const [detailsOpen, setDetailsOpen] = useState(false);
@@ -53,7 +57,6 @@ export function UsersPage() {
       }, 800);
     }
   };
-
 
   const handleEdit = (user: any) => {
     setSelectedUser(user);
@@ -119,7 +122,7 @@ export function UsersPage() {
 
 
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between flex-wrap gap-2">
         <div>
           <h1 className="text-2xl font-semibold text-foreground">Usuarios</h1>
           <p className="text-muted-foreground mt-1">
@@ -164,7 +167,7 @@ export function UsersPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {usersData.map((user) => (
+                {usersData.length ? usersData.map((user) => (
                   <TableRow
                     key={user.id}
                     className="hover:bg-primary/5 transition-colors duration-150 border-gray-200"
@@ -234,7 +237,13 @@ export function UsersPage() {
                       </div>
                     </TableCell>
                   </TableRow>
-                ))}
+                )) : (
+                  <TableRow>
+                    <TableCell colSpan={6} className="h-24 text-center">
+                      No se encontraron usuarios
+                    </TableCell>
+                  </TableRow>
+                )}
               </TableBody>
             </Table>
           </div>

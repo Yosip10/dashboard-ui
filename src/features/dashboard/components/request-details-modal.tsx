@@ -1,3 +1,4 @@
+import { useState } from "react";
 import {
     Dialog,
     DialogContent,
@@ -8,7 +9,6 @@ import {
 import { Button } from "@/shared/ui/button";
 import { Badge } from "@/shared/ui/badge";
 import { Copy, ExternalLink, Check, Calendar, FileText, Key, Globe, Activity } from "lucide-react";
-import { useState } from "react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/shared/ui/tooltip";
 
 interface FlowRequest {
@@ -89,6 +89,7 @@ export function RequestDetailsModal({
                         </div>
                     </div>
 
+
                     <div className="space-y-4 rounded-lg border p-4 bg-muted/30">
                         {/* Document Info */}
                         <div className="grid grid-cols-2 gap-4">
@@ -99,6 +100,17 @@ export function RequestDetailsModal({
                             <div className="space-y-1">
                                 <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">No. Documento</span>
                                 <p className="font-medium font-mono">{request.document}</p>
+                            </div>
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-4">
+                            <div className="space-y-1">
+                                <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Monto de Riesgo</span>
+                                <p className="font-medium">$0</p>
+                            </div>
+                            <div className="space-y-1">
+                                <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Tipo de Flujo</span>
+                                <p className="font-medium font-mono">Flujo de Prueba</p>
                             </div>
                         </div>
 
@@ -137,10 +149,11 @@ export function RequestDetailsModal({
                                 </div>
                             </div>
 
+
                             <div className="space-y-1.5">
                                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
                                     <Globe className="w-4 h-4" />
-                                    URL de Seguimiento
+                                    URL
                                 </div>
                                 <div className="flex items-center gap-2">
                                     <code className="flex-1 bg-background border rounded px-3 py-1.5 font-mono text-sm truncate">
@@ -184,6 +197,55 @@ export function RequestDetailsModal({
                                     </div>
                                 </div>
                             </div>
+                            <div className="space-y-1.5">
+                                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                                    <Globe className="w-4 h-4" />
+                                    URL CALLBACK
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <code className="flex-1 bg-background border rounded px-3 py-1.5 font-mono text-sm truncate">
+                                        {request.url}
+                                    </code>
+                                    <div className="flex gap-1">
+                                        <TooltipProvider>
+                                            <Tooltip>
+                                                <TooltipTrigger asChild>
+                                                    <Button
+                                                        variant="outline"
+                                                        size="icon"
+                                                        onClick={() => copyToClipboard(request.url, "url")}
+                                                        className="h-8 w-8 hover:text-white hover:bg-primary"
+                                                    >
+                                                        {copiedId === "url" ? (
+                                                            <Check className="w-4 h-4" />
+                                                        ) : (
+                                                            <Copy className="w-4 h-4" />
+                                                        )}
+                                                    </Button>
+                                                </TooltipTrigger>
+                                                <TooltipContent>Copiar URL</TooltipContent>
+                                            </Tooltip>
+                                        </TooltipProvider>
+                                        <TooltipProvider>
+                                            <Tooltip>
+                                                <TooltipTrigger asChild>
+                                                    <Button
+                                                        variant="outline"
+                                                        size="icon"
+                                                        onClick={() => window.open(request.url, "_blank")}
+                                                        className="h-8 w-8 hover:text-white hover:bg-primary"
+                                                    >
+                                                        <ExternalLink className="w-4 h-4" />
+                                                    </Button>
+                                                </TooltipTrigger>
+                                                <TooltipContent>Abrir enlace</TooltipContent>
+                                            </Tooltip>
+                                        </TooltipProvider>
+                                    </div>
+                                </div>
+                            </div>
+
+
                         </div>
                     </div>
                 </div>

@@ -15,13 +15,9 @@ export const useCreateUserMutation = () => {
             if (response.error) throw response.error;
             return response.data;
         },
-        onSuccess: (data) => {
-            if (data?.success) {
-                toast.success("Usuario creado exitosamente.");
-                queryClient.invalidateQueries({ queryKey: ["users"] });
-            } else {
-                toast.error(typeof data?.message === 'string' ? data.message : "Error al crear usuario");
-            }
+        onSuccess: () => {
+            toast.success("Usuario creado exitosamente.");
+            queryClient.invalidateQueries({ queryKey: ["users"] });
         },
         onError: (error: any) => {
             console.error("Create User Error:", error);

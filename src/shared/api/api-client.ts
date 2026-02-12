@@ -37,6 +37,7 @@ apiClient.interceptors.response.use(
         const apiError: ApiError = {
             message: "Ha ocurrido un error inesperado",
             originalError: error
+
         };
 
         if (error.response) {
@@ -51,10 +52,10 @@ apiClient.interceptors.response.use(
             // Asignar mensajes estándar de HTTP a mensajes amigables para el usuario
             const httpMessages: Record<number, string> = {
                 400: "Solicitud incorrecta. Por favor, verifica los datos.",
-                401: "No autorizado. Su sesión puede haber expirado.",
+                401: "No autorizado. La sesión expiró.",
                 403: "No tienes permiso para realizar esta acción.",
                 404: "El recurso solicitado no fue encontrado.",
-                409: "Conflicto en la solicitud. El recurso ya podría existir.",
+                409: "El recurso ya existe.",
                 500: "Error interno del servidor. Inténtalo más tarde.",
                 502: "Puerta de enlace incorrecta.",
                 503: "El servicio no está disponible temporalmente.",

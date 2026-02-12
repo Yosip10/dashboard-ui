@@ -48,7 +48,7 @@ export const getUsersService = async (accountId: string, payload: ListUsersPaylo
 
 export const createUserService = async (data: CreateUserRequest, accountId: string): Promise<ApiResponse<CreateUserResponse>> => {
     try {
-        const response = await apiClient.post<CreateUserResponse>(API_URL, data, {
+        const response = await apiClient.post<CreateUserResponse>(`${API_URL}/TuyaQA/v1/createUser`, data, {
             headers: {
                 "x-accountId": accountId,
                 "Content-Type": "application/json"

@@ -65,21 +65,19 @@ export function CreateUserModal({ open, onOpenChange }: CreateUserModalProps) {
         };
 
         createUser(payload, {
-            onSuccess: (data) => {
-                if (data.success) {
-                    onOpenChange(false);
-                    // Reset form
-                    setFormData({
-                        username: "",
-                        email: "",
-                        firstName: "",
-                        lastName: "",
-                        enabled: true,
-                        emailVerified: true,
-                        password: "",
-                        temporaryPassword: false
-                    });
-                }
+            onSuccess: () => {
+                onOpenChange(false);
+                setFormData({
+                    username: "",
+                    email: "",
+                    firstName: "",
+                    lastName: "",
+                    enabled: true,
+                    emailVerified: true,
+                    password: "",
+                    temporaryPassword: false
+                });
+
             }
         });
     };

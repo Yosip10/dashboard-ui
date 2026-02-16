@@ -50,7 +50,7 @@ export function Header({ onMenuClick, activeView }: HeaderProps) {
         }
     }
     return (
-        <header className="h-16 border-b overflow-x-auto bg-background px-4 md:px-6 flex items-center justify-between sticky top-0 z-20">
+        <header className="h-16 border-b border-gray-200 overflow-x-auto bg-background px-4 md:px-6 flex items-center justify-between sticky top-0 z-20">
             <div className="flex items-center gap-1">
                 <Button
                     variant="ghost"

@@ -169,7 +169,7 @@ export function RolesPage() {
                 {rolesData.length ? rolesData.map((role, index) => (
                   <TableRow
                     key={role.id}
-                    className="hover:bg-primary/5 transition-colors duration-150"
+                    className="hover:bg-primary/5 transition-colors duration-150 border-gray-200"
                     style={{ animationDelay: `${index * 50}ms` }}
                   >
                     <TableCell className="font-mono text-sm text-muted-foreground pl-5">

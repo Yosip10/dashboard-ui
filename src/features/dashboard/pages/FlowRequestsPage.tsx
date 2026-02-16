@@ -153,7 +153,7 @@ export function FlowRequestsPage() {
             <CardContent className="p-0 border border-gray-200">
               <Table>
                 <TableHeader>
-                  <TableRow className="hover:bg-transparent">
+                  <TableRow className="hover:bg-transparent border-gray-200">
                     <TableHead className="font-semibold pl-5">ID</TableHead>
                     <TableHead className="font-semibold">
                       Fecha Creación
@@ -172,7 +172,7 @@ export function FlowRequestsPage() {
                   {requestsData.length ? requestsData.map((request, index) => (
                     <TableRow
                       key={request.id}
-                      className="hover:bg-primary/5 transition-colors duration-150"
+                      className="hover:bg-primary/5 transition-colors duration-150 border-gray-200"
                       style={{ animationDelay: `${index * 50}ms` }}
                     >
                       <TableCell className="font-mono text-sm text-muted-foreground pl-5">

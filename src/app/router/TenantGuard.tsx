@@ -73,6 +73,7 @@ export const TenantGuard = () => {
         root.style.setProperty('--foreground', theme.foreground);
         root.style.setProperty('--card-bg', theme.cardBackground);
         root.style.setProperty('--border', theme.border);
+        root.style.setProperty('--primary-foreground', theme.primaryForeground);
     }, [currentTenant]);
 
     // Caso 1: No parámetro de inquilino -> Redirigir a 404

@@ -10,7 +10,8 @@
             "background": "#f0f9fb",
             "foreground": "#082f49",
             "cardBackground": "#ffffff",
-            "border": "#cffafe"
+            "border": "#cffafe",
+            "primaryForeground": "#ffffff"
         },
         "logo": {
             "width": "100px",
@@ -29,7 +30,8 @@
             "background": "#ffffff",
             "foreground": "#7f1d1d",
             "cardBackground": "#fef2f2",
-            "border": "#fecaca"
+            "border": "#fecaca",
+            "primaryForeground": "#ffffff"
         },
         "logo": {
             "width": "150px",
@@ -48,12 +50,33 @@
             "background": "#f8fafc",
             "foreground": "#0f172a",
             "cardBackground": "#ffffff",
-            "border": "#e2e8f0"
+            "border": "#e2e8f0",
+            "primaryForeground": "#ffffff"
         },
         "logo": {
             "width": "128px",
             "height": "128px",
             "url": "https://upload.wikimedia.org/wikipedia/commons/6/61/Seguros_SURA_Logo.svg"
+        }
+    },
+    "lulo": {
+        "id": "4",
+        "name": "Lulo",
+        "description": "Una paleta cítrica y refrescante con alto contraste.",
+        "theme": {
+            "primary": "#e8ff00",
+            "secondary": "#1a1a1a",
+            "accent": "#000000",
+            "background": "#FBFCF8",
+            "foreground": "#121622",
+            "cardBackground": "#121212",
+            "border": "#2e2e2e",
+            "primaryForeground": "#121622"
+        },
+        "logo": {
+            "width": "128px",
+            "height": "128px",
+            "url": "https://colombiafintech.co/wp-content/uploads/2025/03/Lulo-Bank.png"
         }
     }
 }

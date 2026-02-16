@@ -191,7 +191,7 @@ export function LoginView() {
                                 </div>
                                 <button
                                     type="button"
-                                    className="text-sm text-primary hover:text-primary font-medium transition-colors"
+                                    className="text-sm text-foreground/80 hover:text-foreground/80 font-medium transition-colors"
                                 >
                                     Olvidé mi contraseña
                                 </button>
@@ -205,7 +205,7 @@ export function LoginView() {
                             >
                                 {isPending ? (
                                     <div className="flex items-center gap-2">
-                                        <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                                        <div className="w-5 h-5 border-2 border-gray-100 border-t-foreground/30 rounded-full animate-spin" />
                                         Ingresando...
                                     </div>
                                 ) : (

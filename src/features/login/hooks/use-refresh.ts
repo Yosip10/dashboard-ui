@@ -27,7 +27,7 @@ export const useRefreshMutation = () => {
                     expires_in: authData.expiresIn,
                     refresh_expires_in: authData.refreshExpiresIn || 0,
                 });
-                toast.success("Sesión renovada con éxito.");
+
             }
         },
         onError: (error: any) => {

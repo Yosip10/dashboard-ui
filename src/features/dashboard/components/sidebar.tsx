@@ -70,7 +70,7 @@ export function Sidebar({ activeView, onViewChange, isOpen }: SidebarProps) {
                                         "w-full flex items-center gap-3 px-3 py-2 rounded-md transition-all duration-200 group cursor-pointer",
                                         isActive
                                             ? "bg-primary/10 text-primary shadow-sm"
-                                            : "text-muted-foreground hover:bg-gray-100 hover:text-foreground",
+                                            : "text-muted-foreground hover:bg-foreground/5 hover:text-foreground",
                                     )}
                                 >
                                     {/* Glassmorphism icon container */}

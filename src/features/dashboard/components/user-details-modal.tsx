@@ -32,7 +32,7 @@ export function UserDetailsModal({ open, onOpenChange, user }: UserDetailsModalP
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="p-0 sm:max-w-2xl border-0 shadow-2xl overflow-hidden rounded-xl">
+            <DialogContent className="p-0 sm:max-w-2xl border-0 shadow-2xl overflow-hidden rounded-xl h-[90%]">
                 {/* Banner Decorativo */}
                 <div className="h-32 bg-primary relative">
                     <div className="absolute -bottom-12 left-8">

@@ -1,4 +1,3 @@
-import React, { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/shared/ui/dialog";
 import { Button } from "@/shared/ui/button";
 import { Input } from "@/shared/ui/input";
@@ -7,80 +6,68 @@ import { Checkbox } from "@/shared/ui/checkbox";
 import { User, Mail, Lock, Loader2 } from "lucide-react";
 import { useCreateUserMutation } from "../hooks/use-create-user";
 import { toast } from "sonner";
+import { useForm } from "react-hook-form"
+import { yupResolver } from "@hookform/resolvers/yup"
+import * as yup from "yup"
 
 interface CreateUserModalProps {
     open: boolean;
     onOpenChange: (open: boolean) => void;
 }
 
+const schema = yup.object({
+    username: yup.string().required("El usuario es obligatorio"),
+    email: yup.string().required("El correo es obligatorio"),
+    firstName: yup.string().required("El nombre es obligatorio").min(5, "El nombre debe tener al menos 5 caracteres"),
+    lastName: yup.string().required("El apellido es obligatorio").min(5, "El apellido debe tener al menos 5 caracteres"),
+    password: yup.string().required("La contraseña es obligatoria").min(8, "La contraseña debe tener al menos 8 caracteres"),
+    temporaryPassword: yup.boolean().default(false),
+    enabled: yup.boolean().default(true),
+    emailVerified: yup.boolean().default(true),
+}).required();
+
 export function CreateUserModal({ open, onOpenChange }: CreateUserModalProps) {
     const { mutate: createUser, isPending } = useCreateUserMutation();
 
-    // Form State
-    const [formData, setFormData] = useState({
-        username: "",
-        email: "",
-        firstName: "",
-        lastName: "",
-        enabled: true,
-        emailVerified: true,
-        password: "",
-        temporaryPassword: false
+    // 2. Inicializar useForm con valores por defecto
+    const {
+        register,
+        handleSubmit,
+        formState: { errors },
+    } = useForm({
+        defaultValues: {
+            username: "",
+            email: "",
+            firstName: "",
+            lastName: "",
+            password: "",
+            temporaryPassword: false,
+            enabled: true,
+            emailVerified: true,
+        },
+        resolver: yupResolver(schema),
     });
 
-    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const { name, value, type, checked } = e.target;
-        setFormData((prev) => ({
-            ...prev,
-            [name]: type === "checkbox" ? checked : value
-        }));
-    };
-
-    const handleCheckboxChange = (name: string, checked: boolean) => {
-        setFormData((prev) => ({ ...prev, [name]: checked }));
-    };
-
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
-
-        if (!formData.username || !formData.email || !formData.password) {
-            toast.error("Por favor completa los campos obligatorios.");
-            return;
+    const onSubmit = handleSubmit((data) => {
+        if (!data.username || !data.email || !data.password) {
+            return toast.error("Todos los campos con obligatorios");
         }
-
-        const payload = {
-            username: formData.username,
-            email: formData.email,
-            enabled: formData.enabled,
-            firstName: formData.firstName,
-            lastName: formData.lastName,
-            emailVerified: formData.emailVerified,
+        createUser({
+            username: data.username,
+            email: data.email,
+            enabled: data.enabled,
+            firstName: data.firstName,
+            lastName: data.lastName,
+            emailVerified: data.emailVerified,
             credentials: [
                 {
                     type: "password",
-                    value: formData.password,
-                    temporary: formData.temporaryPassword
+                    value: data.password,
+                    temporary: data.temporaryPassword
                 }
             ]
-        };
-
-        createUser(payload, {
-            onSuccess: () => {
-                onOpenChange(false);
-                setFormData({
-                    username: "",
-                    email: "",
-                    firstName: "",
-                    lastName: "",
-                    enabled: true,
-                    emailVerified: true,
-                    password: "",
-                    temporaryPassword: false
-                });
-
-            }
         });
-    };
+    })
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
@@ -92,35 +79,33 @@ export function CreateUserModal({ open, onOpenChange }: CreateUserModalProps) {
                     <p className="text-secondary text-sm opacity-90">Ingresa los datos para registrar un nuevo usuario en el sistema.</p>
                 </DialogHeader>
 
-                <form onSubmit={handleSubmit} className="p-6 space-y-4 max-h-[70vh] overflow-y-auto custom-scrollbar">
+                <form onSubmit={onSubmit} className="p-6 space-y-4 max-h-[70vh] overflow-y-auto custom-scrollbar">
 
                     {/* Username & Email */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="space-y-2">
                             <Label htmlFor="username" className="text-sm font-semibold">Usuario (Username)</Label>
                             <Input
-                                id="username"
+                                {...register("username")}
                                 name="username"
                                 placeholder="ej. usuario.apigw"
-                                value={formData.username}
-                                onChange={handleInputChange}
+                                className={errors.username ? "border-red-500" : ""}
                                 required
                             />
+                            {errors.username && <p className="text-red-500 text-sm">{errors.username.message}</p>}
                         </div>
                         <div className="space-y-2">
                             <Label htmlFor="email" className="text-sm font-semibold">Correo Electrónico</Label>
                             <div className="relative">
                                 <Mail className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                                 <Input
-                                    id="email"
-                                    name="email"
                                     type="email"
                                     placeholder="correo@ejemplo.com"
-                                    className="pl-9"
-                                    value={formData.email}
-                                    onChange={handleInputChange}
+                                    className={errors.email ? "border-red-500 pl-9" : "pl-9"}
+                                    {...register("email")}
                                     required
                                 />
+                                {errors.email && <p className="text-red-500 text-sm">{errors.email.message}</p>}
                             </div>
                         </div>
                     </div>
@@ -130,22 +115,20 @@ export function CreateUserModal({ open, onOpenChange }: CreateUserModalProps) {
                         <div className="space-y-2">
                             <Label htmlFor="firstName" className="text-sm font-semibold">Nombre</Label>
                             <Input
-                                id="firstName"
-                                name="firstName"
+                                {...register("firstName")}
                                 placeholder="Nombre"
-                                value={formData.firstName}
-                                onChange={handleInputChange}
+                                className={errors.firstName ? "border-red-500" : ""}
                             />
+                            {errors.firstName && <p className="text-red-500 text-sm">{errors.firstName.message}</p>}
                         </div>
                         <div className="space-y-2">
                             <Label htmlFor="lastName" className="text-sm font-semibold">Apellido</Label>
                             <Input
-                                id="lastName"
-                                name="lastName"
+                                {...register("lastName")}
                                 placeholder="Apellido"
-                                value={formData.lastName}
-                                onChange={handleInputChange}
+                                className={errors.lastName ? "border-red-500" : ""}
                             />
+                            {errors.lastName && <p className="text-red-500 text-sm">{errors.lastName.message}</p>}
                         </div>
                     </div>
 
@@ -156,18 +139,17 @@ export function CreateUserModal({ open, onOpenChange }: CreateUserModalProps) {
                         </Label>
                         <Input
                             id="password"
-                            name="password"
                             type="password"
                             placeholder="Contraseña segura"
-                            value={formData.password}
-                            onChange={handleInputChange}
+                            className={errors.password ? "border-red-500" : ""}
+                            {...register("password")}
                             required
                         />
+                        {errors.password && <p className="text-red-500 text-sm">{errors.password.message}</p>}
                         <div className="flex items-center space-x-2">
                             <Checkbox
                                 id="temporaryPassword"
-                                checked={formData.temporaryPassword}
-                                onCheckedChange={(checked) => handleCheckboxChange("temporaryPassword", checked as boolean)}
+                                {...register("temporaryPassword")}
                             />
                             <Label htmlFor="temporaryPassword" className="text-xs font-normal cursor-pointer">
                                 ¿Contraseña temporal? (El usuario deberá cambiarla al iniciar sesión)
@@ -180,16 +162,14 @@ export function CreateUserModal({ open, onOpenChange }: CreateUserModalProps) {
                         <div className="flex items-center space-x-2">
                             <Checkbox
                                 id="enabled"
-                                checked={formData.enabled}
-                                onCheckedChange={(checked) => handleCheckboxChange("enabled", checked as boolean)}
+                                {...register("enabled")}
                             />
                             <Label htmlFor="enabled" className="text-sm cursor-pointer">Usuario Habilitado</Label>
                         </div>
                         <div className="flex items-center space-x-2">
                             <Checkbox
                                 id="emailVerified"
-                                checked={formData.emailVerified}
-                                onCheckedChange={(checked) => handleCheckboxChange("emailVerified", checked as boolean)}
+                                {...register("emailVerified")}
                             />
                             <Label htmlFor="emailVerified" className="text-sm cursor-pointer">Email Verificado</Label>
                         </div>

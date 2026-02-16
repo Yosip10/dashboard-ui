@@ -61,12 +61,9 @@ export function LoginView() {
 
 
     const onSubmit = handleSubmit((data) => {
-
-
         if (!data.accountId || !data.username || !data.password) {
             return toast.error("Todos los campos con obligatorios");
         }
-        console.log(data)
         loginMutation.mutate({
             username: data.username,
             password: data.password,

@@ -9,7 +9,7 @@ import {
 import { Button } from "@/shared/ui/button";
 import { Badge } from "@/shared/ui/badge";
 import { Copy, ExternalLink, Check, Calendar, FileText, Key, Globe, Activity } from "lucide-react";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/shared/ui/tooltip";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/shared/ui/tooltip";
 
 interface FlowRequest {
     id: string;
@@ -127,25 +127,23 @@ export function RequestDetailsModal({
                                     <code className="flex-1 bg-background border rounded px-3 py-1.5 font-mono text-sm">
                                         {request.key}
                                     </code>
-                                    <TooltipProvider>
-                                        <Tooltip>
-                                            <TooltipTrigger asChild>
-                                                <Button
-                                                    variant="outline"
-                                                    size="icon"
-                                                    onClick={() => copyToClipboard(request.key, "key")}
-                                                    className="h-8 w-8 hover:text-white hover:bg-primary"
-                                                >
-                                                    {copiedId === "key" ? (
-                                                        <Check className="w-4 h-4" />
-                                                    ) : (
-                                                        <Copy className="w-4 h-4" />
-                                                    )}
-                                                </Button>
-                                            </TooltipTrigger>
-                                            <TooltipContent>Copiar clave</TooltipContent>
-                                        </Tooltip>
-                                    </TooltipProvider>
+                                    <Tooltip>
+                                        <TooltipTrigger asChild>
+                                            <Button
+                                                variant="outline"
+                                                size="icon"
+                                                onClick={() => copyToClipboard(request.key, "key")}
+                                                className="h-8 w-8 hover:text-white hover:bg-primary"
+                                            >
+                                                {copiedId === "key" ? (
+                                                    <Check className="w-4 h-4" />
+                                                ) : (
+                                                    <Copy className="w-4 h-4" />
+                                                )}
+                                            </Button>
+                                        </TooltipTrigger>
+                                        <TooltipContent>Copiar clave</TooltipContent>
+                                    </Tooltip>
                                 </div>
                             </div>
 
@@ -160,40 +158,36 @@ export function RequestDetailsModal({
                                         {request.url}
                                     </code>
                                     <div className="flex gap-1">
-                                        <TooltipProvider>
-                                            <Tooltip>
-                                                <TooltipTrigger asChild>
-                                                    <Button
-                                                        variant="outline"
-                                                        size="icon"
-                                                        onClick={() => copyToClipboard(request.url, "url")}
-                                                        className="h-8 w-8 hover:text-white hover:bg-primary"
-                                                    >
-                                                        {copiedId === "url" ? (
-                                                            <Check className="w-4 h-4" />
-                                                        ) : (
-                                                            <Copy className="w-4 h-4" />
-                                                        )}
-                                                    </Button>
-                                                </TooltipTrigger>
-                                                <TooltipContent>Copiar URL</TooltipContent>
-                                            </Tooltip>
-                                        </TooltipProvider>
-                                        <TooltipProvider>
-                                            <Tooltip>
-                                                <TooltipTrigger asChild>
-                                                    <Button
-                                                        variant="outline"
-                                                        size="icon"
-                                                        onClick={() => window.open(request.url, "_blank")}
-                                                        className="h-8 w-8 hover:text-white hover:bg-primary"
-                                                    >
-                                                        <ExternalLink className="w-4 h-4" />
-                                                    </Button>
-                                                </TooltipTrigger>
-                                                <TooltipContent>Abrir enlace</TooltipContent>
-                                            </Tooltip>
-                                        </TooltipProvider>
+                                        <Tooltip>
+                                            <TooltipTrigger asChild>
+                                                <Button
+                                                    variant="outline"
+                                                    size="icon"
+                                                    onClick={() => copyToClipboard(request.url, "url")}
+                                                    className="h-8 w-8 hover:text-white hover:bg-primary"
+                                                >
+                                                    {copiedId === "url" ? (
+                                                        <Check className="w-4 h-4" />
+                                                    ) : (
+                                                        <Copy className="w-4 h-4" />
+                                                    )}
+                                                </Button>
+                                            </TooltipTrigger>
+                                            <TooltipContent>Copiar URL</TooltipContent>
+                                        </Tooltip>
+                                        <Tooltip>
+                                            <TooltipTrigger asChild>
+                                                <Button
+                                                    variant="outline"
+                                                    size="icon"
+                                                    onClick={() => window.open(request.url, "_blank")}
+                                                    className="h-8 w-8 hover:text-white hover:bg-primary"
+                                                >
+                                                    <ExternalLink className="w-4 h-4" />
+                                                </Button>
+                                            </TooltipTrigger>
+                                            <TooltipContent>Abrir enlace</TooltipContent>
+                                        </Tooltip>
                                     </div>
                                 </div>
                             </div>
@@ -207,40 +201,36 @@ export function RequestDetailsModal({
                                         {request.url}
                                     </code>
                                     <div className="flex gap-1">
-                                        <TooltipProvider>
-                                            <Tooltip>
-                                                <TooltipTrigger asChild>
-                                                    <Button
-                                                        variant="outline"
-                                                        size="icon"
-                                                        onClick={() => copyToClipboard(request.url, "url")}
-                                                        className="h-8 w-8 hover:text-white hover:bg-primary"
-                                                    >
-                                                        {copiedId === "url" ? (
-                                                            <Check className="w-4 h-4" />
-                                                        ) : (
-                                                            <Copy className="w-4 h-4" />
-                                                        )}
-                                                    </Button>
-                                                </TooltipTrigger>
-                                                <TooltipContent>Copiar URL</TooltipContent>
-                                            </Tooltip>
-                                        </TooltipProvider>
-                                        <TooltipProvider>
-                                            <Tooltip>
-                                                <TooltipTrigger asChild>
-                                                    <Button
-                                                        variant="outline"
-                                                        size="icon"
-                                                        onClick={() => window.open(request.url, "_blank")}
-                                                        className="h-8 w-8 hover:text-white hover:bg-primary"
-                                                    >
-                                                        <ExternalLink className="w-4 h-4" />
-                                                    </Button>
-                                                </TooltipTrigger>
-                                                <TooltipContent>Abrir enlace</TooltipContent>
-                                            </Tooltip>
-                                        </TooltipProvider>
+                                        <Tooltip>
+                                            <TooltipTrigger asChild>
+                                                <Button
+                                                    variant="outline"
+                                                    size="icon"
+                                                    onClick={() => copyToClipboard(request.url, "url")}
+                                                    className="h-8 w-8 hover:text-white hover:bg-primary"
+                                                >
+                                                    {copiedId === "url" ? (
+                                                        <Check className="w-4 h-4" />
+                                                    ) : (
+                                                        <Copy className="w-4 h-4" />
+                                                    )}
+                                                </Button>
+                                            </TooltipTrigger>
+                                            <TooltipContent>Copiar URL</TooltipContent>
+                                        </Tooltip>
+                                        <Tooltip>
+                                            <TooltipTrigger asChild>
+                                                <Button
+                                                    variant="outline"
+                                                    size="icon"
+                                                    onClick={() => window.open(request.url, "_blank")}
+                                                    className="h-8 w-8 hover:text-white hover:bg-primary"
+                                                >
+                                                    <ExternalLink className="w-4 h-4" />
+                                                </Button>
+                                            </TooltipTrigger>
+                                            <TooltipContent>Abrir enlace</TooltipContent>
+                                        </Tooltip>
                                     </div>
                                 </div>
                             </div>

@@ -9,45 +9,74 @@ import { Checkbox } from "@/shared/ui/checkbox";
 import { useLoginMutation } from "../hooks/use-login";
 import { toast } from "sonner";
 import { useTenant } from "@/shared/context/TenantContext";
+import { useForm } from "react-hook-form"
+import { yupResolver } from "@hookform/resolvers/yup"
+import * as yup from "yup"
+
+
+// 1. Esquema alineado con los nombres del input
+const schema = yup.object({
+    accountId: yup.string().required("El ID de cuenta es obligatorio"),
+    username: yup.string().required("El usuario es obligatorio"),
+    password: yup.string().required("La contraseña es obligatoria"),
+    rememberMe: yup.boolean().default(false),
+}).required();
 
 export function LoginView() {
     const loginMutation = useLoginMutation();
     const [showPassword, setShowPassword] = useState(false);
     const { tenantConfig } = useTenant()
     const isPending = loginMutation.isPending;
-    const [formData, setFormData] = useState({
-        accountId: "TuyaQA",
-        username: "",
-        password: "",
-        rememberMe: false,
+    // 2. Inicializar useForm con valores por defecto
+    const {
+        register,
+        handleSubmit,
+        setValue,
+        watch,
+        formState: { errors },
+    } = useForm({
+        resolver: yupResolver(schema),
+        defaultValues: {
+            accountId: "TuyaQA",
+            username: "",
+            password: "",
+            rememberMe: false,
+        }
     });
-
+    const rememberMeValue = watch("rememberMe");
+    // 3. Cargar datos recordados directamente al formulario
     useEffect(() => {
         const remembered = localStorage.getItem("remember");
         if (remembered) {
             try {
                 const { username, accountId } = JSON.parse(remembered);
-                setFormData(prev => ({ ...prev, username, accountId, rememberMe: true }));
+                setValue("username", username);
+                setValue("accountId", accountId);
+                setValue("rememberMe", true);
             } catch (e) {
                 localStorage.removeItem("remember");
             }
         }
-    }, []);
+    }, [setValue]);
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
 
-        if (!formData.accountId || !formData.username || !formData.password) {
+    const onSubmit = handleSubmit((data) => {
+
+
+        if (!data.accountId || !data.username || !data.password) {
             return toast.error("Todos los campos con obligatorios");
         }
-
+        console.log(data)
         loginMutation.mutate({
-            username: formData.username,
-            password: formData.password,
-            accountId: formData.accountId,
-            rememberMe: formData.rememberMe
+            username: data.username,
+            password: data.password,
+            accountId: data.accountId,
+            rememberMe: data.rememberMe
         });
-    };
+    })
+
+
+
 
     return (
         <div className="min-h-screen bg-white flex items-center justify-center p-4 relative overflow-hidden">
@@ -114,24 +143,18 @@ export function LoginView() {
                 {/* Login Card */}
                 <Card className="border-3 border-gray-100 shadow-2xl shadow-slate-200/50 backdrop-blur-sm bg-background/80">
                     <CardContent className="p-8">
-                        <form onSubmit={handleSubmit} className="space-y-5">
+                        <form onSubmit={onSubmit} className="space-y-5">
                             {/* Usuario */}
                             <div className="space-y-2">
                                 <Label htmlFor="username" className="text-sm font-medium">
                                     Usuario
                                 </Label>
                                 <div className="relative">
-                                    <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                                    <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                                     <Input
-                                        id="username"
-                                        type="text"
+                                        {...register("username")} // Usar el nombre correcto
                                         placeholder="Ingrese su usuario"
-                                        value={formData.username}
-                                        onChange={(e) =>
-                                            setFormData({ ...formData, username: e.target.value })
-                                        }
-                                        className="pl-11 h-12 bg-muted/50 border-transparent focus:border-primary focus:bg-background transition-all duration-200"
-                                        required
+                                        className={errors.username ? "border-red-500 pl-9 py-5" : "pl-9 py-5"}
                                     />
                                 </div>
                             </div>
@@ -142,27 +165,22 @@ export function LoginView() {
                                     Contraseña
                                 </Label>
                                 <div className="relative">
-                                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                                     <Input
-                                        id="password"
                                         type={showPassword ? "text" : "password"}
+                                        {...register("password")} // Usar el nombre correcto
                                         placeholder="Ingrese su contraseña"
-                                        value={formData.password}
-                                        onChange={(e) =>
-                                            setFormData({ ...formData, password: e.target.value })
-                                        }
-                                        className="pl-11 pr-11 h-12 bg-muted/50 border-transparent focus:border-primary focus:bg-background transition-all duration-200"
-                                        required
+                                        className={errors.password ? "border-red-500 pl-9 py-5" : "pl-9 py-5"}
                                     />
                                     <button
                                         type="button"
                                         onClick={() => setShowPassword(!showPassword)}
-                                        className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                                        className="cursor-pointer absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
                                     >
                                         {showPassword ? (
-                                            <EyeOff className="w-5 h-5" />
+                                            <EyeOff className="w-4 h-4" />
                                         ) : (
-                                            <Eye className="w-5 h-5" />
+                                            <Eye className="w-4 h-4" />
                                         )}
                                     </button>
                                 </div>
@@ -173,14 +191,8 @@ export function LoginView() {
                                 <div className="flex items-center gap-2">
                                     <Checkbox
                                         id="rememberMe"
-                                        checked={formData.rememberMe}
-                                        onCheckedChange={(checked) =>
-                                            setFormData({
-                                                ...formData,
-                                                rememberMe: checked as boolean,
-                                            })
-                                        }
-                                        className="data-[state=checked]:bg-primary data-[state=checked]:border-primary"
+                                        checked={rememberMeValue}
+                                        onCheckedChange={(checked) => setValue("rememberMe", checked as boolean)}
                                     />
                                     <Label
                                         htmlFor="rememberMe"
@@ -191,7 +203,7 @@ export function LoginView() {
                                 </div>
                                 <button
                                     type="button"
-                                    className="text-sm text-foreground/80 hover:text-foreground/80 font-medium transition-colors"
+                                    className="text-sm text-primary hover:text-primary font-medium transition-colors"
                                 >
                                     Olvidé mi contraseña
                                 </button>
@@ -205,7 +217,7 @@ export function LoginView() {
                             >
                                 {isPending ? (
                                     <div className="flex items-center gap-2">
-                                        <div className="w-5 h-5 border-2 border-gray-100 border-t-foreground/30 rounded-full animate-spin" />
+                                        <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                                         Ingresando...
                                     </div>
                                 ) : (

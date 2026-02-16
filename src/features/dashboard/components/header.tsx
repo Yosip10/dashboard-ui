@@ -91,7 +91,7 @@ export function Header({ onMenuClick, activeView }: HeaderProps) {
                     </Select>
                 </div>
                 <Tooltip>
-                    <TooltipTrigger>
+                    <TooltipTrigger asChild>
                         <Button
                             size="icon"
                             className="hover:bg-primary/10 hover:text-primary transition-colors duration-200"

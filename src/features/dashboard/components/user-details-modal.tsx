@@ -1,4 +1,4 @@
-import { Dialog, DialogContent } from "@/shared/ui/dialog"
+import { Dialog, DialogContent, DialogTitle } from "@/shared/ui/dialog"
 import { Badge } from "@/shared/ui/badge"
 import { Button } from "@/shared/ui/button"
 import { User, Mail, Calendar, MapPin, Phone, Shield, UserCheck, UserX, Fingerprint } from "lucide-react"
@@ -56,6 +56,9 @@ export function UserDetailsModal({ open, onOpenChange, user }: UserDetailsModalP
 
                 {/* Header Info */}
                 <div className="mt-14 px-8 pb-4 border-b border-border/50">
+                    <DialogTitle className="sr-only">
+                        Detalles del Usuario: {fullName}
+                    </DialogTitle>
                     <div className="flex flex-col">
                         <h2 className="text-2xl font-bold text-foreground">{fullName}</h2>
                         <p className="text-muted-foreground font-medium">@{user.username}</p>

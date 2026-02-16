@@ -65,7 +65,7 @@ export function UpdateUserModal({ open, onOpenChange, user }: UpdateUserModalPro
 
         updateUser(payload, {
             onSuccess: (data) => {
-                if (data.success) {
+                if (data?.success) {
                     onOpenChange(false);
                 }
             }

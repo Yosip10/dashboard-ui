@@ -16,7 +16,6 @@ interface UpdateUserModalProps {
     user: ListUser | null;
 }
 
-
 const schema = yup.object({
     username: yup.string().required("El usuario es obligatorio"),
     email: yup.string().required("El correo es obligatorio"),

@@ -1,10 +1,12 @@
-import { useState } from "react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/shared/ui/dialog"
 import { Button } from "@/shared/ui/button"
 import { Input } from "@/shared/ui/input"
 import { Label } from "@/shared/ui/label"
 import { Switch } from "@/shared/ui/switch"
 import { Checkbox } from "@/shared/ui/checkbox"
+import { useForm } from "react-hook-form"
+import { yupResolver } from "@hookform/resolvers/yup"
+import * as yup from "yup"
 
 interface RoleModalProps {
   open: boolean
@@ -16,6 +18,12 @@ interface RoleModalProps {
     active: boolean
   } | null
 }
+
+const schema = yup.object({
+  name: yup.string().required("El usuario es obligatorio").min(3, "El nombre debe tener al menos 3 caracteres"),
+  modules: yup.array().required("Los módulos son obligatorios").min(1, "Debe seleccionar al menos un módulo"),
+  active: yup.boolean().required("El estado es obligatorio"),
+}).required();
 
 const availableModules = [
   "Usuarios",
@@ -31,24 +39,35 @@ const availableModules = [
 ]
 
 export function RoleModal({ open, onOpenChange, role }: RoleModalProps) {
+
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    watch,
+    formState: { errors },
+  } = useForm({
+    defaultValues: {
+      name: "",
+      modules: [],
+      active: true,
+    },
+    resolver: yupResolver(schema),
+  });
+
+
   const isEditing = !!role
-  const [formData, setFormData] = useState({
-    name: role?.name || "",
-    modules: role?.modules || [],
-    active: role?.active ?? true,
+
+
+
+
+  const onSubmit = handleSubmit((data) => {
+    console.log(data)
+    onOpenChange(false)
+
   })
 
-  const toggleModule = (module: string) => {
-    setFormData((prev) => ({
-      ...prev,
-      modules: prev.modules.includes(module) ? prev.modules.filter((m) => m !== module) : [...prev.modules, module],
-    }))
-  }
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    onOpenChange(false)
-  }
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -56,17 +75,17 @@ export function RoleModal({ open, onOpenChange, role }: RoleModalProps) {
         <DialogHeader>
           <DialogTitle className="text-xl font-semibold">{isEditing ? "Editar Rol" : "Nuevo Rol"}</DialogTitle>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-5 mt-4">
+        <form onSubmit={onSubmit} className="space-y-5 mt-4">
           <div className="space-y-2">
             <Label htmlFor="name">Nombre del Rol</Label>
             <Input
               id="name"
-              value={formData.name}
-              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+              {...register("name")}
               placeholder="Ingrese el nombre del rol"
               className="h-11 bg-muted/50 border-transparent focus:border-primary"
               required
             />
+            {errors.name && <p className="text-red-500 text-sm">{errors.name.message}</p>}
           </div>
 
           <div className="space-y-3">
@@ -76,8 +95,8 @@ export function RoleModal({ open, onOpenChange, role }: RoleModalProps) {
                 <div key={module} className="flex items-center gap-2">
                   <Checkbox
                     id={module}
-                    checked={formData.modules.includes(module)}
-                    onCheckedChange={() => toggleModule(module)}
+                    checked={watch("modules").includes(module)}
+                    onCheckedChange={() => setValue("modules", watch("modules").includes(module) ? watch("modules").filter((m) => m !== module) : [...watch("modules"), module])}
                     className="data-[state=checked]:bg-primary data-[state=checked]:border-primary"
                   />
                   <Label htmlFor={module} className="text-sm cursor-pointer">
@@ -86,14 +105,15 @@ export function RoleModal({ open, onOpenChange, role }: RoleModalProps) {
                 </div>
               ))}
             </div>
+            {errors.modules && <p className="text-red-500 text-sm">{errors.modules.message}</p>}
           </div>
 
           <div className="flex items-center justify-between">
             <Label htmlFor="active">Rol Activo</Label>
             <Switch
               id="active"
-              checked={formData.active}
-              onCheckedChange={(checked) => setFormData({ ...formData, active: checked })}
+              {...register("active")}
+              checked={watch("active")}
               className="data-[state=checked]:bg-primary"
             />
           </div>

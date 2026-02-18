@@ -6,7 +6,7 @@ const API_URL = import.meta.env.VITE_HOST_API_INFO;
 
 export const deleteUserService = async (userId: string, accountId: string): Promise<ApiResponse<GenericResponse>> => {
     try {
-        const response = await apiClient.delete<GenericResponse>(`${API_URL}/${userId}`, {
+        const response = await apiClient.delete<GenericResponse>(`${API_URL}/TuyaQA/v1/users/${userId}`, {
             headers: {
                 "x-accountId": accountId
             }

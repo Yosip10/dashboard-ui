@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, keepPreviousData } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { useAuthStore } from "@/features/login/store/auth.store";
 import type { ListUsersPayload } from "../types/users";
@@ -22,6 +22,7 @@ export const useUsers = (params: ListUsersPayload, useMock = false) => {
             return data;
         },
         enabled: !!token && !!accountId,
+        placeholderData: keepPreviousData,
     });
 };
 

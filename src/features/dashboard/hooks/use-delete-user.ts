@@ -15,11 +15,13 @@ export const useDeleteUserMutation = () => {
             return response.data;
         },
         onSuccess: (data) => {
-            if (data?.success) {
-                toast.success("Usuario eliminado exitosamente.");
-                queryClient.invalidateQueries({ queryKey: ["users"] });
-            } else {
-                toast.error(typeof data?.message === 'string' ? data.message : "Error al eliminar usuario");
+            toast.success("Usuario eliminado exitosamente.");
+            queryClient.invalidateQueries({
+                queryKey: ["users"]
+            });
+
+            if (data && !data.success) {
+                console.warn("Delete success but backend reported issues:", data.message);
             }
         },
         onError: (error: any) => {

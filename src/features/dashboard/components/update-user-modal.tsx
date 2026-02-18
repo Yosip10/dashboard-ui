@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/shared/ui/dialog";
 import { Button } from "@/shared/ui/button";
 import { Input } from "@/shared/ui/input";
@@ -25,7 +26,6 @@ const schema = yup.object({
 }).required();
 
 export function UpdateUserModal({ open, onOpenChange, user }: UpdateUserModalProps) {
-    const { mutate: updateUser, isPending } = useUpdateUserMutation();
 
     const { register, handleSubmit, formState: { errors }, reset } = useForm<{
         username: string;
@@ -35,15 +35,21 @@ export function UpdateUserModal({ open, onOpenChange, user }: UpdateUserModalPro
         enabled: boolean;
     }>({
         resolver: yupResolver(schema),
-        defaultValues: {
-            username: user?.username || "",
-            email: user?.email || "",
-            firstName: user?.firstName || "",
-            lastName: user?.lastName || "",
-            enabled: user?.enabled ?? true
-        }
     });
 
+    useEffect(() => {
+        if (user && open) {
+            reset({
+                username: user.username,
+                email: user.email,
+                firstName: user.firstName,
+                lastName: user.lastName,
+                enabled: user.enabled
+            });
+        }
+    }, [user, open, reset]);
+
+    const { mutate: updateUser, isPending } = useUpdateUserMutation(onOpenChange, reset);
     const onSubmit = handleSubmit((data) => {
         if (!user) return;
 

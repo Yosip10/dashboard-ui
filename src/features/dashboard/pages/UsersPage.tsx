@@ -20,22 +20,20 @@ import { useUsers } from "../hooks/use-users";
 import {
   PaginationControls
 } from "@/shared/components/pagination-controls";
-import { MOCK_USERS } from "../data/mock-users";
 import { useSearch } from "@/shared/hooks";
 
 
 export function UsersPage() {
   const [page, setPage] = useState(1);
   const pageSize = 10;
-  const [isSimulatingLoading, setIsSimulatingLoading] = useState(false);
   const { search, column } = useSearch();
 
-  const { data: response, isLoading, isError } = useUsers({
+  const { data: response, isLoading, isFetching, isError } = useUsers({
     limit: pageSize,
     skip: (page - 1) * pageSize,
     search,
     column
-  }, true);
+  }, false);
 
   const [modalOpen, setModalOpen] = useState(false);
   const [detailsOpen, setDetailsOpen] = useState(false);
@@ -44,17 +42,13 @@ export function UsersPage() {
   const [selectedUser, setSelectedUser] = useState<any>(null);
 
   const usersData = response?.data?.users || [];
-  const totalUsers = MOCK_USERS.length;
+  const totalUsers = response?.data?.total || usersData.length;
   const totalPages = Math.ceil(totalUsers / pageSize);
 
   const handlePageChange = (newPage: number) => {
     if (newPage >= 1 && newPage <= totalPages) {
-      setIsSimulatingLoading(true);
-      setTimeout(() => {
-        setPage(newPage);
-        setIsSimulatingLoading(false);
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-      }, 800);
+      setPage(newPage);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
 
@@ -77,7 +71,7 @@ export function UsersPage() {
     setCreateModalOpen(true);
   };
 
-  if (isLoading) {
+  if (isLoading && !usersData.length) {
     return (
       <div className="flex items-center justify-center h-64">
         <Loader2 className="w-8 h-8 animate-spin text-primary" />
@@ -97,12 +91,13 @@ export function UsersPage() {
 
   return (
     <div className="space-y-6">
+      {/* Modals ... */}
       <UpdateUserModal
         open={modalOpen}
         onOpenChange={setModalOpen}
         user={selectedUser}
       />
-
+      {/* ... previous content ... */}
       <UserDetailsModal
         open={detailsOpen}
         onOpenChange={setDetailsOpen}
@@ -141,7 +136,7 @@ export function UsersPage() {
 
       {/* Table */}
       <div className="overflow-hidden rounded-xs relative">
-        {isSimulatingLoading && (
+        {isFetching && (
           <div className="absolute inset-0 bg-background/50 backdrop-blur-[1px] z-10 flex items-center justify-center rounded-lg">
             <div className="bg-background p-4 rounded-full shadow-lg border border-primary/20">
               <Loader2 className="w-8 h-8 animate-spin text-primary" />

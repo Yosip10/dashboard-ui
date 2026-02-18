@@ -13,7 +13,7 @@ export const updateUserService = async (data: UpdateUserRequest, accountId: stri
             enabled: data.enabled
         };
 
-        const response = await apiClient.put<GenericResponse>(`${API_URL}/${data.id}`, updatePayload, {
+        const response = await apiClient.put<GenericResponse>(`${API_URL}/TuyaQA/v1/users/${data.id}`, updatePayload, {
             headers: {
                 "x-accountId": accountId,
                 "Content-Type": "application/json"

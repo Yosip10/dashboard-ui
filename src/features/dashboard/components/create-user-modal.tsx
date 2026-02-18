@@ -27,12 +27,11 @@ const schema = yup.object({
 }).required();
 
 export function CreateUserModal({ open, onOpenChange }: CreateUserModalProps) {
-    const { mutate: createUser, isPending } = useCreateUserMutation();
 
-    // 2. Inicializar useForm con valores por defecto
     const {
         register,
         handleSubmit,
+        reset,
         formState: { errors },
     } = useForm({
         defaultValues: {
@@ -47,6 +46,7 @@ export function CreateUserModal({ open, onOpenChange }: CreateUserModalProps) {
         },
         resolver: yupResolver(schema),
     });
+    const { mutate: createUser, isPending } = useCreateUserMutation(onOpenChange, reset);
 
     const onSubmit = handleSubmit((data) => {
         if (!data.username || !data.email || !data.password) {
@@ -87,10 +87,8 @@ export function CreateUserModal({ open, onOpenChange }: CreateUserModalProps) {
                             <Label htmlFor="username" className="text-sm font-semibold">Usuario (Username)</Label>
                             <Input
                                 {...register("username")}
-                                name="username"
                                 placeholder="ej. usuario.apigw"
                                 className={errors.username ? "border-red-500" : ""}
-                                required
                             />
                             {errors.username && <p className="text-red-500 text-sm">{errors.username.message}</p>}
                         </div>
@@ -103,7 +101,6 @@ export function CreateUserModal({ open, onOpenChange }: CreateUserModalProps) {
                                     placeholder="correo@ejemplo.com"
                                     className={errors.email ? "border-red-500 pl-9" : "pl-9"}
                                     {...register("email")}
-                                    required
                                 />
                                 {errors.email && <p className="text-red-500 text-sm">{errors.email.message}</p>}
                             </div>
@@ -143,7 +140,6 @@ export function CreateUserModal({ open, onOpenChange }: CreateUserModalProps) {
                             placeholder="Contraseña segura"
                             className={errors.password ? "border-red-500" : ""}
                             {...register("password")}
-                            required
                         />
                         {errors.password && <p className="text-red-500 text-sm">{errors.password.message}</p>}
                         <div className="flex items-center space-x-2">

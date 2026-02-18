@@ -1,48 +1,46 @@
 import type { ApiResponse } from "@/shared/api/types";
-import { MOCK_USERS } from "../data/mock-users";
-import type { ListUsersPayload, ListUsersResponse, UserColumn } from "../types/users";
+import type { ListUsersPayload, ListUsersResponse } from "../types/users";
 import apiClient from "@/shared/api/api-client";
 
-const API_URL = import.meta.env.VITE_HOST_API_INFO;
-const DEFAULT_PAYLOAD: ListUsersPayload = {
-    attributesToGet: "",
-    filter: "",
-    limit: 10,
-    skip: 0
-};
-
-
-export const getUsersService = async (accountId: string, payload: ListUsersPayload, useMock = false): Promise<ApiResponse<ListUsersResponse>> => {
-    if (useMock) {
-        console.log(payload.column);
-        // Simulate pagination for mock data
-        const limit = payload.limit || 10;
-        const skip = payload.skip || 0;
-        const paginatedUsers = MOCK_USERS.slice(skip, skip + limit);
-        const resultRearch = paginatedUsers.filter((user) => user[payload?.column as UserColumn || "id"].toLowerCase().includes(payload.search?.toLowerCase() || ""));
-
-        return {
-            data: {
-                success: true,
-                message: "Mock users loaded successfully",
-                StatusCode: "200",
-                data: {
-                    users: resultRearch
-                }
-            },
-            error: null
-        };
-    }
-
+export const getUsersService = async (accountId: string, payload: ListUsersPayload, _useMock = false): Promise<ApiResponse<ListUsersResponse>> => {
     try {
-        const finalPayload = { ...DEFAULT_PAYLOAD, ...payload };
-        const response = await apiClient.post<ListUsersResponse>(API_URL, finalPayload, {
+        const REAL_API_URL = "https://apigw-v2-dev.ado-tech.com/TuyaQA/v1/getAllUsers";
+
+        const params = {
+            search: payload.search || payload.filter || "",
+            first: payload.skip || 0,
+            max: payload.limit || 10
+        };
+
+        const response = await apiClient.get<any>(REAL_API_URL, {
             headers: {
                 "x-accountId": accountId
-            }
+            },
+            params
         });
-        return { data: response.data, error: null };
+
+        // The backend returns an array of users directly: ListUser[]
+        const usersArray = Array.isArray(response.data) ? response.data : [];
+
+        // Try to get total from headers (standard name is x-total-count)
+        // Fallback: if we got exactly 'max' items, assume there's at least one more page
+        const totalFromHeader = parseInt(response.headers?.['x-total-count'] || response.headers?.['total-count'] || "0");
+        const total = totalFromHeader > 0 ? totalFromHeader : (usersArray.length === params.max ? (params.first + params.max + 1) : (params.first + usersArray.length));
+
+        // Transform to match ListUsersResponse interface
+        const transformedResponse: ListUsersResponse = {
+            success: true,
+            message: "Usuarios cargados exitosamente",
+            StatusCode: "200",
+            data: {
+                users: usersArray,
+                total: total
+            }
+        };
+
+        return { data: transformedResponse, error: null };
     } catch (error: any) {
+        console.error("Error in getUsersService:", error);
         return { data: null, error };
     }
 };

@@ -56,6 +56,7 @@ export interface ListUsersResponse {
     code?: string;
     data: {
         users: ListUser[];
+        total?: number;
     };
 }
 

@@ -4,7 +4,7 @@ import type { CreateUserRequest } from "../types/users";
 import { useAuthStore } from "@/features/login/store/auth.store";
 import { createUserService } from "../services/create-user.service";
 
-export const useCreateUserMutation = () => {
+export const useCreateUserMutation = (onClose: (open: boolean) => void, reset: () => void) => {
     const queryClient = useQueryClient();
     const { user } = useAuthStore();
     const accountId = user?.["x-accountId"] || "";
@@ -18,6 +18,8 @@ export const useCreateUserMutation = () => {
         onSuccess: () => {
             toast.success("Usuario creado exitosamente.");
             queryClient.invalidateQueries({ queryKey: ["users"] });
+            onClose(false);
+            reset();
         },
         onError: (error: any) => {
             console.error("Create User Error:", error);

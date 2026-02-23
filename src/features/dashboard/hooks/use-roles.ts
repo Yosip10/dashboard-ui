@@ -12,8 +12,8 @@ export const useRoles = (params: ListRolesPayload, useMock = false) => {
     return useQuery({
         queryKey: ["roles", token, accountId, params, useMock],
         queryFn: async () => {
-            const { data, error } = await getRolesService(accountId || "", params, useMock);
-
+            const { data, error } = await getRolesService();
+            console.log("data", data)
             if (error) {
                 toast.error(error.message);
                 throw error;

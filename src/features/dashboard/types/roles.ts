@@ -4,11 +4,20 @@ export interface RoleUser {
 }
 
 export interface Role {
-    id: string;
-    name: string;
-    users: RoleUser[];
-    modules: string[];
-    active: boolean;
+    id: string,
+    name: string,
+    path: string,
+    attributes: {
+        modulesLinked: string[],
+        description: string[]
+    },
+    realmRoles: string[],
+    clientRoles: {
+        "realm-management": string[],
+        broker: string[],
+        account: string[]
+    },
+    subGroups: string[]
 }
 
 export interface ListRolesPayload {
@@ -20,13 +29,6 @@ export interface ListRolesPayload {
     skip?: number;
 }
 
-export interface ListRolesResponse {
-    success: boolean;
-    message: string | { error: string };
-    StatusCode: string;
-    data: {
-        roles: Role[];
-    };
-}
+
 
 export type RoleColumn = "id" | "name";

@@ -1,10 +1,9 @@
 import { useState } from "react";
-import { Eye, Pencil, Trash2, Plus } from "lucide-react";
+import { Eye, Pencil, Trash2, Plus, Shield } from "lucide-react";
 import { CardContent, CardHeader, CardTitle } from "@/shared/ui/card";
 import { Button } from "@/shared/ui/button";
 import { Badge } from "@/shared/ui/badge";
-import { Switch } from "@/shared/ui/switch";
-import { Avatar, AvatarFallback } from "@/shared/ui/avatar";
+import { Avatar, AvatarFallback, AvatarGroup } from "@/shared/ui/avatar";
 import {
   Table,
   TableBody,
@@ -20,12 +19,81 @@ import {
 } from "@/shared/ui/tooltip";
 import { RoleModal } from "../components/role-modal";
 import { RoleDetailsModal } from "../components/role-details-modal";
+import { RolePermissionsModal } from "../components/role-permissions-modal";
 import DeleteRolesAlert from "../components/delete-roles-alert";
 import { PaginationControls } from "@/shared/components/pagination-controls";
 import { Loader2, X } from "lucide-react";
 import { MOCK_ROLES } from "../data/mock-roles";
 import { useRoles } from "../hooks/use-roles";
 import { useSearch } from "@/shared/hooks";
+import { useRoleMembers } from "../hooks/use-role-members";
+import type { Role } from "../types/roles";
+
+const formatName = (name: string) =>
+  name.replace(/^MODULE[- ]/i, "").replace(/^\w/, (c: string) => c.toUpperCase());
+
+/* Sub-component: fetches & renders member avatars for a single role */
+function RoleMembersCell({ roleId }: { roleId: string }) {
+  const { data: members, isLoading } = useRoleMembers(roleId);
+  const MAX = 4;
+
+  if (isLoading) {
+    return <Loader2 className="w-4 h-4 animate-spin text-muted-foreground" />;
+  }
+  if (!members || members.length === 0) {
+    return <span className="text-xs text-muted-foreground">—</span>;
+  }
+
+  const visible = members.slice(0, MAX);
+  const rest = members.slice(MAX);
+
+  function initials(m: { firstName?: string; lastName?: string; username: string }) {
+    if (m.firstName && m.lastName) return `${m.firstName[0]}${m.lastName[0]}`.toUpperCase();
+    return m.username.slice(0, 2).toUpperCase();
+  }
+
+  const BG_COLORS = ["bg-sky-500", "bg-violet-500", "bg-emerald-500", "bg-amber-500"];
+
+  return (
+    <div className="flex items-center gap-1">
+      <AvatarGroup>
+        {visible.map((m, i) => (
+          <Tooltip key={m.id}>
+            <TooltipTrigger asChild>
+              <Avatar className="w-8 h-8 border-2 border-background cursor-pointer">
+                <AvatarFallback className={`${BG_COLORS[i % BG_COLORS.length]} text-white text-xs`}>
+                  {initials(m)}
+                </AvatarFallback>
+              </Avatar>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>{m.firstName ? `${m.firstName} ${m.lastName ?? ""}`.trim() : m.username}</p>
+            </TooltipContent>
+          </Tooltip>
+        ))}
+      </AvatarGroup>
+      {rest.length > 0 && (
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Badge variant="secondary" className="text-xs cursor-help ml-1">
+              +{rest.length}
+            </Badge>
+          </TooltipTrigger>
+          <TooltipContent>
+            <div className="flex flex-col gap-1">
+              {rest.map((m) => (
+                <span key={m.id}>
+                  {m.firstName ? `${m.firstName} ${m.lastName ?? ""}`.trim() : m.username}
+                </span>
+              ))}
+            </div>
+          </TooltipContent>
+        </Tooltip>
+      )}
+    </div>
+  );
+}
+
 
 export function RolesPage() {
   const [page, setPage] = useState(1);
@@ -33,14 +101,13 @@ export function RolesPage() {
   const [isSimulatingLoading, setIsSimulatingLoading] = useState(false);
   const { search, column } = useSearch();
 
-  const { data: response, isLoading, isError } = useRoles({
+  const { data: roles, isLoading, isError } = useRoles({
     limit: pageSize,
     skip: (page - 1) * pageSize,
     search,
     column
   }, true);
 
-  const rolesData = response?.data?.roles || [];
   const totalRoles = MOCK_ROLES.length;
   const totalPages = Math.ceil(totalRoles / pageSize);
 
@@ -54,21 +121,22 @@ export function RolesPage() {
       }, 800);
     }
   };
-
   const [modalOpen, setModalOpen] = useState(false);
-  const [selectedRole, setSelectedRole] = useState<(typeof MOCK_ROLES)[0] | null>(
+  const [selectedRole, setSelectedRole] = useState<Role | null>(
     null,
   );
   const [detailsModalOpen, setDetailsModalOpen] = useState(false);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
-  const [viewRole, setViewRole] = useState<(typeof MOCK_ROLES)[0] | null>(null);
+  const [viewRole, setViewRole] = useState<Role | null>(null);
+  const [permissionsModalOpen, setPermissionsModalOpen] = useState(false);
+  const [permissionsRole, setPermissionsRole] = useState<Role | null>(null);
 
-  const handleViewDetails = (role: (typeof MOCK_ROLES)[0]) => {
+  const handleViewDetails = (role: Role) => {
     setViewRole(role);
     setDetailsModalOpen(true);
   };
 
-  const handleEdit = (role: (typeof MOCK_ROLES)[0]) => {
+  const handleEdit = (role: Role) => {
     setSelectedRole(role);
     setModalOpen(true);
   };
@@ -78,9 +146,14 @@ export function RolesPage() {
     setModalOpen(true);
   };
 
-  const handleDelete = (role: (typeof MOCK_ROLES)[0]) => {
+  const handleDelete = (role: Role) => {
     setSelectedRole(role);
     setDeleteModalOpen(true);
+  };
+
+  const handlePermissions = (role: Role) => {
+    setPermissionsRole(role);
+    setPermissionsModalOpen(true);
   };
 
   if (isLoading) {
@@ -117,6 +190,11 @@ export function RolesPage() {
         open={deleteModalOpen}
         onOpenChange={setDeleteModalOpen}
         role={selectedRole}
+      />
+      <RolePermissionsModal
+        open={permissionsModalOpen}
+        onOpenChange={setPermissionsModalOpen}
+        role={permissionsRole}
       />
 
       {/* Header */}
@@ -155,83 +233,96 @@ export function RolesPage() {
             <Table>
               <TableHeader>
                 <TableRow className="hover:bg-transparent border-gray-200">
-                  <TableHead className="font-semibold pl-5">Código</TableHead>
                   <TableHead className="font-semibold">Nombre del Rol</TableHead>
                   <TableHead className="font-semibold">Usuarios</TableHead>
                   <TableHead className="font-semibold">Módulos</TableHead>
-                  <TableHead className="font-semibold">Activo</TableHead>
+                  <TableHead className="font-semibold">Descripción</TableHead>
                   <TableHead className="font-semibold text-right">
                     Acciones
                   </TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {rolesData.length ? rolesData.map((role, index) => (
+                {roles?.length ? roles.map((role, index) => (
                   <TableRow
                     key={role.id}
                     className="hover:bg-primary/5 transition-colors duration-150 border-gray-200"
                     style={{ animationDelay: `${index * 50}ms` }}
                   >
-                    <TableCell className="font-mono text-sm text-muted-foreground pl-5">
-                      {role.id}
-                    </TableCell>
-                    <TableCell className="font-medium">{role.name}</TableCell>
-                    <TableCell>
-                      <div className="flex -space-x-2">
-                        {role.users.map((user, i) => (
-                          <Avatar
-                            key={i}
-                            className="w-8 h-8 border-2 border-background"
-                          >
-                            <AvatarFallback
-                              className={`${user.color} text-white text-xs`}
-                            >
-                              {user.initials}
-                            </AvatarFallback>
-                          </Avatar>
-                        ))}
-                      </div>
+
+                    <TableCell className="font-medium">
+                      {formatName(role.name.split("-")[1])}
                     </TableCell>
                     <TableCell>
-                      <div className="flex flex-wrap gap-1 max-w-xs">
-                        {role.modules.slice(0, 3).map((module) => (
-                          <Badge
-                            key={module}
-                            variant="secondary"
-                            className="bg-primary/10 text-primary hover:bg-primary/20 text-xs"
-                          >
-                            {module}
-                          </Badge>
-                        ))}
-                        {role.modules.length > 3 && (
+                      <RoleMembersCell roleId={role.id} />
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-1">
+                        <AvatarGroup>
+                          {role.attributes.modulesLinked.slice(0, 5).map((module) => {
+                            const moduleData = JSON.parse(module);
+                            const formattedName = formatName(moduleData.name);
+                            return (
+                              <Tooltip key={module}>
+                                <TooltipTrigger asChild>
+                                  <Avatar className="w-8 h-8 border-2 border-background cursor-pointer">
+                                    <AvatarFallback className="bg-primary text-white text-xs">
+                                      {formattedName[0]}
+                                    </AvatarFallback>
+                                  </Avatar>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                  <p>{formattedName}</p>
+                                </TooltipContent>
+                              </Tooltip>
+                            );
+                          })}
+                        </AvatarGroup>
+                        {role.attributes.modulesLinked.length > 5 && (
                           <Tooltip>
                             <TooltipTrigger asChild>
                               <Badge
                                 variant="secondary"
-                                className="bg-muted text-muted-foreground text-xs cursor-help"
+                                className="bg-muted text-muted-foreground text-xs cursor-help ml-1"
                               >
-                                +{role.modules.length - 3}
+                                +{role.attributes.modulesLinked.length - 5}
                               </Badge>
                             </TooltipTrigger>
                             <TooltipContent>
                               <div className="flex flex-col gap-1">
-                                {role.modules.slice(3).map((module) => (
-                                  <span key={module}>{module}</span>
-                                ))}
+                                {role.attributes.modulesLinked.slice(5).map((module) => {
+                                  const moduleData = JSON.parse(module);
+                                  return (
+                                    <span key={module}>
+                                      {formatName(moduleData.name)}
+                                    </span>
+                                  );
+                                })}
                               </div>
                             </TooltipContent>
                           </Tooltip>
                         )}
                       </div>
                     </TableCell>
+
                     <TableCell>
-                      <Switch
-                        checked={role.active}
-                        className="data-[state=checked]:bg-primary"
-                      />
+                      <p>{role.attributes.description.join(", ")}</p>
                     </TableCell>
                     <TableCell className="text-right">
                       <div className="flex items-center justify-end gap-1">
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-8 w-8 hover:bg-primary/10 hover:text-primary"
+                              onClick={() => handlePermissions(role)}
+                            >
+                              <Shield className="w-4 h-4" />
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent>Gestionar permisos</TooltipContent>
+                        </Tooltip>
                         <Button
                           variant="ghost"
                           size="icon"

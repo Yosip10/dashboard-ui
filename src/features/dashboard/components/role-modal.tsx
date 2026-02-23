@@ -7,16 +7,12 @@ import { Checkbox } from "@/shared/ui/checkbox"
 import { useForm } from "react-hook-form"
 import { yupResolver } from "@hookform/resolvers/yup"
 import * as yup from "yup"
+import type { Role } from "../types/roles";
 
 interface RoleModalProps {
   open: boolean
   onOpenChange: (open: boolean) => void
-  role?: {
-    id: string
-    name: string
-    modules: string[]
-    active: boolean
-  } | null
+  role?: Role | null
 }
 
 const schema = yup.object({

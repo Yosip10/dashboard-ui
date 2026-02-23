@@ -9,19 +9,11 @@ import { Button } from "@/shared/ui/button";
 import { Badge } from "@/shared/ui/badge";
 import { Avatar, AvatarFallback } from "@/shared/ui/avatar";
 import { Shield, Users, Layers, CheckCircle, XCircle } from "lucide-react";
+import type { Role } from "../types/roles";
 
-interface RoleUser {
-    initials: string;
-    color: string;
-}
 
-interface Role {
-    id: string;
-    name: string;
-    users: RoleUser[];
-    modules: string[];
-    active: boolean;
-}
+
+
 
 interface RoleDetailsModalProps {
     open: boolean;
@@ -63,9 +55,9 @@ export function RoleDetailsModal({
                             </div>
                             <p className="font-medium text-lg">{role.name}</p>
                         </div>
-                        <div className="space-y-1">
+                        {/*                         <div className="space-y-1">
                             <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                                {role.active ? (
+                                {role.attributes.active ? (
                                     <CheckCircle className="w-4 h-4 text-green-500" />
                                 ) : (
                                     <XCircle className="w-4 h-4 text-primary" />
@@ -78,7 +70,7 @@ export function RoleDetailsModal({
                             >
                                 {role.active ? "Activo" : "Inactivo"}
                             </Badge>
-                        </div>
+                        </div> */}
                     </div>
 
                     <div className="space-y-4">
@@ -88,7 +80,7 @@ export function RoleDetailsModal({
                                 <Users className="w-4 h-4" />
                                 Usuarios Asignados
                             </div>
-                            {role.users.length > 0 ? (
+                            {/*                  {role.users.length > 0 ? (
                                 <div className="flex flex-wrap gap-2">
                                     {role.users.map((user, i) => (
                                         <Avatar
@@ -105,7 +97,7 @@ export function RoleDetailsModal({
                                 <p className="text-sm text-muted-foreground italic">
                                     No hay usuarios asignados a este rol.
                                 </p>
-                            )}
+                            )} */}
                         </div>
 
                         {/* Modules */}
@@ -114,9 +106,9 @@ export function RoleDetailsModal({
                                 <Layers className="w-4 h-4" />
                                 Módulos con Acceso
                             </div>
-                            {role.modules.length > 0 ? (
+                            {role.attributes.modulesLinked.length > 0 ? (
                                 <div className="flex flex-wrap gap-2">
-                                    {role.modules.map((module) => (
+                                    {role.attributes.modulesLinked.map((module) => (
                                         <Badge
                                             key={module}
                                             variant="secondary"

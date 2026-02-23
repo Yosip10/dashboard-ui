@@ -33,8 +33,8 @@ export function UsersPage() {
     skip: (page - 1) * pageSize,
     search,
     column
-  }, false);
-
+  });
+  console.log("response", response)
   const [modalOpen, setModalOpen] = useState(false);
   const [detailsOpen, setDetailsOpen] = useState(false);
   const [createModalOpen, setCreateModalOpen] = useState(false);

@@ -4,15 +4,14 @@ import { useAuthStore } from "@/features/login/store/auth.store";
 import type { ListUsersPayload } from "../types/users";
 import { getUsersService } from "../services/get-users.service";
 
-export const useUsers = (params: ListUsersPayload, useMock = false) => {
+export const useUsers = (params: ListUsersPayload) => {
     const { user } = useAuthStore();
     const token = user?.access_token;
     const accountId = user?.["x-accountId"];
-
     return useQuery({
-        queryKey: ["users", token, accountId, params, useMock],
+        queryKey: ["users", params.skip],
         queryFn: async () => {
-            const { data, error } = await getUsersService(accountId || "", params, useMock);
+            const { data, error } = await getUsersService(accountId || "", params);
 
             if (error) {
                 toast.error(error.message);

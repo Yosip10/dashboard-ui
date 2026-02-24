@@ -7,9 +7,8 @@ import {
 } from "@/shared/ui/dialog";
 import { Button } from "@/shared/ui/button";
 import { Badge } from "@/shared/ui/badge";
-import { Avatar, AvatarFallback } from "@/shared/ui/avatar";
-import { Shield, Users, Layers, CheckCircle, XCircle } from "lucide-react";
-import type { Role } from "../types/roles";
+import { Shield, Users, Layers } from "lucide-react";
+import type { Role } from "../../types/roles";
 
 
 

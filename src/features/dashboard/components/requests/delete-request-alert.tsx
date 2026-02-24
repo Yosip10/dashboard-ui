@@ -1,19 +1,19 @@
 import { Button } from "@/shared/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/shared/ui/dialog";
 import { Loader2, Trash2 } from "lucide-react";
-import { useDeleteUserMutation } from "../hooks/use-delete-user";
+import { useDeleteUserMutation } from "../../hooks/use-delete-user";
 
-interface DeleteRolesAlertProps {
+interface DeleteRequestAlertProps {
     open: boolean;
     onOpenChange: (open: boolean) => void;
-    role: { id: string; name: string } | null;
+    request: { id: string; key: string } | null;
 }
-const DeleteRolesAlert = ({ open, onOpenChange, role }: DeleteRolesAlertProps) => {
+const DeleteRequestAlert = ({ open, onOpenChange, request }: DeleteRequestAlertProps) => {
     const { mutate: deleteUser, isPending } = useDeleteUserMutation();
 
     const handleDelete = () => {
-        if (role) {
-            deleteUser(role.id, {
+        if (request) {
+            deleteUser(request.id, {
                 onSuccess: () => {
                     onOpenChange(false);
                 },
@@ -29,7 +29,7 @@ const DeleteRolesAlert = ({ open, onOpenChange, role }: DeleteRolesAlertProps) =
                         <Trash2 className="w-5 h-5" /> Confirmar Eliminación
                     </DialogTitle>
                     <DialogDescription className="pt-2">
-                        ¿Estás seguro que deseas eliminar el rol <span className="font-semibold text-foreground">{role?.name}</span> ?
+                        ¿Estás seguro que deseas eliminar la solicitud <span className="font-semibold text-foreground">{request?.id}</span> ?
                         <br />
                         Esta acción no se puede deshacer.
                     </DialogDescription>
@@ -54,7 +54,7 @@ const DeleteRolesAlert = ({ open, onOpenChange, role }: DeleteRolesAlertProps) =
                                 Eliminando...
                             </>
                         ) : (
-                            "Eliminar Rol"
+                            "Eliminar Solicitud"
                         )}
                     </Button>
                 </DialogFooter>
@@ -63,4 +63,4 @@ const DeleteRolesAlert = ({ open, onOpenChange, role }: DeleteRolesAlertProps) =
     );
 };
 
-export default DeleteRolesAlert;
+export default DeleteRequestAlert;

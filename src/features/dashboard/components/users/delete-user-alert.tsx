@@ -1,19 +1,27 @@
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+    DialogDescription,
+    DialogFooter,
+} from "@/shared/ui/dialog";
 import { Button } from "@/shared/ui/button";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/shared/ui/dialog";
 import { Loader2, Trash2 } from "lucide-react";
-import { useDeleteUserMutation } from "../hooks/use-delete-user";
+import { useDeleteUserMutation } from "../../hooks/use-delete-user";
 
-interface DeleteRequestAlertProps {
+interface DeleteUserAlertProps {
     open: boolean;
     onOpenChange: (open: boolean) => void;
-    request: { id: string; key: string } | null;
+    user: { id: string; username: string } | null;
 }
-const DeleteRequestAlert = ({ open, onOpenChange, request }: DeleteRequestAlertProps) => {
+
+export function DeleteUserAlert({ open, onOpenChange, user }: DeleteUserAlertProps) {
     const { mutate: deleteUser, isPending } = useDeleteUserMutation();
 
     const handleDelete = () => {
-        if (request) {
-            deleteUser(request.id, {
+        if (user) {
+            deleteUser(user.id, {
                 onSuccess: () => {
                     onOpenChange(false);
                 },
@@ -29,7 +37,7 @@ const DeleteRequestAlert = ({ open, onOpenChange, request }: DeleteRequestAlertP
                         <Trash2 className="w-5 h-5" /> Confirmar Eliminación
                     </DialogTitle>
                     <DialogDescription className="pt-2">
-                        ¿Estás seguro que deseas eliminar la solicitud <span className="font-semibold text-foreground">{request?.id}</span> ?
+                        ¿Estás seguro que deseas eliminar al usuario <span className="font-semibold text-foreground">@{user?.username}</span>?
                         <br />
                         Esta acción no se puede deshacer.
                     </DialogDescription>
@@ -54,13 +62,11 @@ const DeleteRequestAlert = ({ open, onOpenChange, request }: DeleteRequestAlertP
                                 Eliminando...
                             </>
                         ) : (
-                            "Eliminar Solicitud"
+                            "Eliminar Usuario"
                         )}
                     </Button>
                 </DialogFooter>
             </DialogContent>
         </Dialog>
     );
-};
-
-export default DeleteRequestAlert;
+}

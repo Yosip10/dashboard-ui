@@ -1,27 +1,19 @@
-import {
-    Dialog,
-    DialogContent,
-    DialogHeader,
-    DialogTitle,
-    DialogDescription,
-    DialogFooter,
-} from "@/shared/ui/dialog";
 import { Button } from "@/shared/ui/button";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/shared/ui/dialog";
 import { Loader2, Trash2 } from "lucide-react";
-import { useDeleteUserMutation } from "../hooks/use-delete-user";
+import { useDeleteUserMutation } from "../../hooks/use-delete-user";
 
-interface DeleteUserAlertProps {
+interface DeleteRolesAlertProps {
     open: boolean;
     onOpenChange: (open: boolean) => void;
-    user: { id: string; username: string } | null;
+    role: { id: string; name: string } | null;
 }
-
-export function DeleteUserAlert({ open, onOpenChange, user }: DeleteUserAlertProps) {
+const DeleteRolesAlert = ({ open, onOpenChange, role }: DeleteRolesAlertProps) => {
     const { mutate: deleteUser, isPending } = useDeleteUserMutation();
 
     const handleDelete = () => {
-        if (user) {
-            deleteUser(user.id, {
+        if (role) {
+            deleteUser(role.id, {
                 onSuccess: () => {
                     onOpenChange(false);
                 },
@@ -37,7 +29,7 @@ export function DeleteUserAlert({ open, onOpenChange, user }: DeleteUserAlertPro
                         <Trash2 className="w-5 h-5" /> Confirmar Eliminación
                     </DialogTitle>
                     <DialogDescription className="pt-2">
-                        ¿Estás seguro que deseas eliminar al usuario <span className="font-semibold text-foreground">@{user?.username}</span>?
+                        ¿Estás seguro que deseas eliminar el rol <span className="font-semibold text-foreground">{role?.name}</span> ?
                         <br />
                         Esta acción no se puede deshacer.
                     </DialogDescription>
@@ -62,11 +54,13 @@ export function DeleteUserAlert({ open, onOpenChange, user }: DeleteUserAlertPro
                                 Eliminando...
                             </>
                         ) : (
-                            "Eliminar Usuario"
+                            "Eliminar Rol"
                         )}
                     </Button>
                 </DialogFooter>
             </DialogContent>
         </Dialog>
     );
-}
+};
+
+export default DeleteRolesAlert;

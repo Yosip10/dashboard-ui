@@ -1,18 +1,20 @@
+import { useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/shared/ui/dialog";
 import { Button } from "@/shared/ui/button";
 import { Input } from "@/shared/ui/input";
 import { Label } from "@/shared/ui/label";
 import { Checkbox } from "@/shared/ui/checkbox";
-import { User, Mail, Lock, Loader2 } from "lucide-react";
-import { useCreateUserMutation } from "../hooks/use-create-user";
-import { toast } from "sonner";
+import { Loader2, Pencil } from "lucide-react";
+import { useUpdateUserMutation } from "../../hooks/use-update-user";
 import { useForm } from "react-hook-form"
 import { yupResolver } from "@hookform/resolvers/yup"
 import * as yup from "yup"
+import type { ListUser } from "../../types/users";
 
-interface CreateUserModalProps {
+interface UpdateUserModalProps {
     open: boolean;
     onOpenChange: (open: boolean) => void;
+    user: ListUser | null;
 }
 
 const schema = yup.object({
@@ -20,63 +22,65 @@ const schema = yup.object({
     email: yup.string().required("El correo es obligatorio"),
     firstName: yup.string().required("El nombre es obligatorio").min(5, "El nombre debe tener al menos 5 caracteres"),
     lastName: yup.string().required("El apellido es obligatorio").min(5, "El apellido debe tener al menos 5 caracteres"),
-    password: yup.string().required("La contraseña es obligatoria").min(8, "La contraseña debe tener al menos 8 caracteres"),
-    temporaryPassword: yup.boolean().default(false),
     enabled: yup.boolean().default(true),
-    emailVerified: yup.boolean().default(true),
 }).required();
 
-export function CreateUserModal({ open, onOpenChange }: CreateUserModalProps) {
+export function UpdateUserModal({ open, onOpenChange, user }: UpdateUserModalProps) {
 
-    const {
-        register,
-        handleSubmit,
-        reset,
-        formState: { errors },
-    } = useForm({
-        defaultValues: {
-            username: "",
-            email: "",
-            firstName: "",
-            lastName: "",
-            password: "",
-            temporaryPassword: false,
-            enabled: true,
-            emailVerified: true,
-        },
+    const { register, handleSubmit, formState: { errors }, reset } = useForm<{
+        username: string;
+        email: string;
+        firstName: string;
+        lastName: string;
+        enabled: boolean;
+    }>({
         resolver: yupResolver(schema),
     });
-    const { mutate: createUser, isPending } = useCreateUserMutation(onOpenChange, reset);
 
-    const onSubmit = handleSubmit((data) => {
-        if (!data.username || !data.email || !data.password) {
-            return toast.error("Todos los campos con obligatorios");
+    useEffect(() => {
+        if (user && open) {
+            reset({
+                username: user.username,
+                email: user.email,
+                firstName: user.firstName,
+                lastName: user.lastName,
+                enabled: user.enabled
+            });
         }
-        createUser({
-            username: data.username,
-            email: data.email,
-            enabled: data.enabled,
+    }, [user, open, reset]);
+
+    const { mutate: updateUser, isPending } = useUpdateUserMutation(onOpenChange, reset);
+    const onSubmit = handleSubmit((data) => {
+        if (!user) return;
+
+        const payload: any = {
+            id: user.id,
             firstName: data.firstName,
             lastName: data.lastName,
-            emailVerified: data.emailVerified,
-            credentials: [
-                {
-                    type: "password",
-                    value: data.password,
-                    temporary: data.temporaryPassword
+            email: data.email,
+            enabled: data.enabled
+        };
+
+        updateUser(payload, {
+            onSuccess: (data) => {
+                if (data?.success) {
+                    onOpenChange(false);
                 }
-            ]
+            }
         });
     })
 
+
+    if (!user) return null;
+
     return (
-        <Dialog open={open} onOpenChange={onOpenChange}>
+        <Dialog open={open} onOpenChange={() => { onOpenChange(false); reset(); }}>
             <DialogContent className="sm:max-w-[500px] p-0 overflow-hidden border-none shadow-2xl rounded-xl">
                 <DialogHeader className="p-6 bg-primary/80 text-white">
                     <DialogTitle className="text-xl font-bold flex items-center gap-2">
-                        <User className="w-5 h-5" /> Crear Nuevo Usuario
+                        <Pencil className="w-5 h-5" /> Editar Usuario
                     </DialogTitle>
-                    <p className="text-secondary text-sm opacity-90">Ingresa los datos para registrar un nuevo usuario en el sistema.</p>
+                    <p className="text-secondary text-sm opacity-90">Modifica los datos del usuario @{user.username}</p>
                 </DialogHeader>
 
                 <form onSubmit={onSubmit} className="p-6 space-y-4 max-h-[70vh] overflow-y-auto custom-scrollbar">
@@ -84,23 +88,25 @@ export function CreateUserModal({ open, onOpenChange }: CreateUserModalProps) {
                     {/* Username & Email */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="space-y-2">
-                            <Label htmlFor="username" className="text-sm font-semibold">Usuario (Username)</Label>
+                            <Label htmlFor="username_edit" className="text-sm font-semibold">Usuario (Username)</Label>
                             <Input
+                                placeholder="Usuario"
+                                id="username_edit"
                                 {...register("username")}
-                                placeholder="ej. usuario.apigw"
                                 className={errors.username ? "border-red-500" : ""}
                             />
                             {errors.username && <p className="text-red-500 text-sm">{errors.username.message}</p>}
                         </div>
                         <div className="space-y-2">
-                            <Label htmlFor="email" className="text-sm font-semibold">Correo Electrónico</Label>
+                            <Label htmlFor="email_edit" className="text-sm font-semibold">Correo Electrónico</Label>
                             <div className="relative">
-                                <Mail className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                                 <Input
+                                    placeholder="Correo electrónico"
+                                    id="email_edit"
                                     type="email"
-                                    placeholder="correo@ejemplo.com"
-                                    className={errors.email ? "border-red-500 pl-9" : "pl-9"}
+                                    className={errors.email ? "border-red-500" : ""}
                                     {...register("email")}
+                                    required
                                 />
                                 {errors.email && <p className="text-red-500 text-sm">{errors.email.message}</p>}
                             </div>
@@ -110,64 +116,37 @@ export function CreateUserModal({ open, onOpenChange }: CreateUserModalProps) {
                     {/* First Name & Last Name */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="space-y-2">
-                            <Label htmlFor="firstName" className="text-sm font-semibold">Nombre</Label>
+                            <Label htmlFor="firstName_edit" className="text-sm font-semibold">Nombre</Label>
                             <Input
-                                {...register("firstName")}
                                 placeholder="Nombre"
+                                id="firstName_edit"
+                                {...register("firstName")}
                                 className={errors.firstName ? "border-red-500" : ""}
+                                required
                             />
                             {errors.firstName && <p className="text-red-500 text-sm">{errors.firstName.message}</p>}
                         </div>
                         <div className="space-y-2">
-                            <Label htmlFor="lastName" className="text-sm font-semibold">Apellido</Label>
+                            <Label htmlFor="lastName_edit" className="text-sm font-semibold">Apellido</Label>
                             <Input
-                                {...register("lastName")}
                                 placeholder="Apellido"
+                                id="lastName_edit"
+                                {...register("lastName")}
                                 className={errors.lastName ? "border-red-500" : ""}
+                                required
                             />
                             {errors.lastName && <p className="text-red-500 text-sm">{errors.lastName.message}</p>}
                         </div>
                     </div>
 
-                    {/* Password Section */}
-                    <div className="space-y-3 pt-2 border-t border-border">
-                        <Label htmlFor="password" className="text-sm font-semibold flex items-center gap-2">
-                            <Lock className="w-4 h-4 text-primary" /> Contraseña Inicial
-                        </Label>
-                        <Input
-                            id="password"
-                            type="password"
-                            placeholder="Contraseña segura"
-                            className={errors.password ? "border-red-500" : ""}
-                            {...register("password")}
-                        />
-                        {errors.password && <p className="text-red-500 text-sm">{errors.password.message}</p>}
-                        <div className="flex items-center space-x-2">
-                            <Checkbox
-                                id="temporaryPassword"
-                                {...register("temporaryPassword")}
-                            />
-                            <Label htmlFor="temporaryPassword" className="text-xs font-normal cursor-pointer">
-                                ¿Contraseña temporal? (El usuario deberá cambiarla al iniciar sesión)
-                            </Label>
-                        </div>
-                    </div>
-
-                    {/* Checkboxes: Enabled & Email Verified */}
+                    {/* Checkbox: Enabled */}
                     <div className="flex gap-6 pt-2">
                         <div className="flex items-center space-x-2">
                             <Checkbox
-                                id="enabled"
+                                id="enabled_edit"
                                 {...register("enabled")}
                             />
-                            <Label htmlFor="enabled" className="text-sm cursor-pointer">Usuario Habilitado</Label>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                            <Checkbox
-                                id="emailVerified"
-                                {...register("emailVerified")}
-                            />
-                            <Label htmlFor="emailVerified" className="text-sm cursor-pointer">Email Verificado</Label>
+                            <Label htmlFor="enabled_edit" className="text-sm cursor-pointer">Usuario Habilitado</Label>
                         </div>
                     </div>
 
@@ -188,10 +167,10 @@ export function CreateUserModal({ open, onOpenChange }: CreateUserModalProps) {
                             {isPending ? (
                                 <>
                                     <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                                    Creando...
+                                    Actualizando...
                                 </>
                             ) : (
-                                "Crear Usuario"
+                                "Guardar Cambios"
                             )}
                         </Button>
                     </div>

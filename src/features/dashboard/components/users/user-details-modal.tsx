@@ -2,7 +2,7 @@ import { Dialog, DialogContent, DialogTitle } from "@/shared/ui/dialog"
 import { Badge } from "@/shared/ui/badge"
 import { Button } from "@/shared/ui/button"
 import { User, Mail, Calendar, MapPin, Phone, Shield, UserCheck, UserX, Fingerprint } from "lucide-react"
-import type { ListUser } from "../types/users"
+import type { ListUser } from "../../types/users"
 import { Avatar, AvatarFallback, AvatarImage } from "@/shared/ui/avatar"
 
 interface UserDetailsModalProps {

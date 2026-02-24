@@ -10,7 +10,7 @@ import { Badge } from "@/shared/ui/badge";
 import { Button } from "@/shared/ui/button";
 import { Checkbox } from "@/shared/ui/checkbox";
 import { Shield } from "lucide-react";
-import type { Role } from "../types/roles";
+import type { Role } from "../../types/roles";
 
 /* ─── Types ─────────────────────────────────────────────── */
 interface PermissionRow {

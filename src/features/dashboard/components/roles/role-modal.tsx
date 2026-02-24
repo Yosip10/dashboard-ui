@@ -7,7 +7,7 @@ import { Checkbox } from "@/shared/ui/checkbox"
 import { useForm } from "react-hook-form"
 import { yupResolver } from "@hookform/resolvers/yup"
 import * as yup from "yup"
-import type { Role } from "../types/roles";
+import type { Role } from "../../types/roles";
 
 interface RoleModalProps {
   open: boolean

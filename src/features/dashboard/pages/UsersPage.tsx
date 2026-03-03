@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useState } from "react";
 import { Eye, Pencil, Trash2, Plus, X, Loader2 } from "lucide-react";
 import { CardContent, CardHeader, CardTitle } from "@/shared/ui/card";
 import { Button } from "@/shared/ui/button";
@@ -20,8 +20,6 @@ import { useUsers } from "../hooks/use-users";
 import { PaginationControls } from "@/shared/components/pagination-controls";
 import { usePagination } from "@/shared/hooks/use-pagination";
 import { useSearch } from "@/shared/hooks";
-import { useState } from "react";
-import { toast } from "sonner";
 
 export function UsersPage() {
   const { search, column } = useSearch();
@@ -58,20 +56,11 @@ export function UsersPage() {
 
   const usersData = response?.data?.users || [];
 
-  // Notificar al hook de paginación cuando lleguen datos
-  const prevFetchingRef = useRef(isFetching);
+  // * Sincronizar el estado de la paginación con los datos cargados
   useEffect(() => {
-    // Solo reaccionar cuando termina un fetch (isFetching cambia de true → false)
-    if (prevFetchingRef.current && !isFetching) {
-      const count = usersData.length;
-      if (count === 0 && currentPage > 1) {
-        toast.warning("No hay más registros disponibles.", {
-          description: "Has llegado al final de la lista.",
-        });
-      }
-      handleDataLoaded(count);
+    if (!isFetching) {
+      handleDataLoaded(usersData.length);
     }
-    prevFetchingRef.current = isFetching;
   }, [isFetching, usersData.length, currentPage, handleDataLoaded]);
 
   const handleEdit = (user: any) => {

@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useEffect } from "react";
 import { Eye, Copy, ExternalLink, Plus, Check } from "lucide-react";
 import { CardContent, CardHeader, CardTitle } from "@/shared/ui/card";
 import { Button } from "@/shared/ui/button";
@@ -36,6 +36,7 @@ export function FlowRequestsPage() {
     currentPage,
     pageSize,
     visitedPages,
+    handleDataLoaded,
     goToPage,
     nextPage,
     prevPage,
@@ -46,6 +47,7 @@ export function FlowRequestsPage() {
   const {
     data: response,
     isLoading,
+    isFetching,
     isError,
   } = useRequests(
     {
@@ -56,11 +58,21 @@ export function FlowRequestsPage() {
     true,
   );
 
+  const requestsData = response?.data ?? [];
+
+  // * Sincronizar el estado de la paginación con los datos cargados
+  useEffect(() => {
+    // Si no está cargando nada, informamos al hook cuántos datos llegaron
+    // El hook internamente decide si debe agregar una nueva página o no
+    if (!isFetching) {
+      handleDataLoaded(requestsData.length);
+    }
+  }, [isFetching, requestsData.length, currentPage, handleDataLoaded]);
+
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [detailsModalOpen, setDetailsModalOpen] = useState(false);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
-  const isFetching = useRef(false);
   const [selectedRequest, setSelectedRequest] = useState<FlowRequest | null>(
     null,
   );
@@ -95,7 +107,7 @@ export function FlowRequestsPage() {
     }
   };
 
-  if (isLoading) {
+  if (isLoading && requestsData.length === 0) {
     return (
       <div className="flex items-center justify-center h-64">
         <Loader2 className="w-8 h-8 animate-spin text-primary" />
@@ -150,7 +162,7 @@ export function FlowRequestsPage() {
 
         {/* Table */}
         <div className="overflow-hidden rounded-xs relative">
-          {isFetching.current && (
+          {isFetching && (
             <div className="absolute inset-0 bg-background/50 backdrop-blur-[1px] z-10 flex items-center justify-center rounded-lg">
               <div className="bg-background p-4 rounded-full shadow-lg border border-primary/20">
                 <Loader2 className="w-8 h-8 animate-spin text-primary" />
@@ -179,8 +191,8 @@ export function FlowRequestsPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {response?.data?.length ? (
-                  response.data.map((request, index) => (
+                {requestsData.length ? (
+                  requestsData.map((request, index) => (
                     <TableRow
                       key={request.key}
                       className="hover:bg-primary/5 transition-colors duration-150 border-gray-200"
@@ -330,7 +342,7 @@ export function FlowRequestsPage() {
             onPageChange={goToPage}
             onNext={nextPage}
             onPrev={prevPage}
-            isLoading={isFetching.current}
+            isLoading={isFetching}
             isAtEnd={isAtEnd}
           />
         </div>

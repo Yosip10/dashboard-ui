@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { Eye, Pencil, Trash2, Plus, Shield } from "lucide-react";
 import { CardContent, CardHeader, CardTitle } from "@/shared/ui/card";
 import { Button } from "@/shared/ui/button";
@@ -24,14 +24,12 @@ import { useSearch } from "@/shared/hooks";
 import { useRoleMembers } from "../hooks/use-role-members";
 import { usePagination } from "@/shared/hooks/use-pagination";
 import type { Role } from "../types/roles";
-import { toast } from "sonner";
 
 const formatName = (name: string) =>
   name
     .replace(/^MODULE[- ]/i, "")
     .replace(/^\w/, (c: string) => c.toUpperCase());
 
-/* Sub-component: fetches & renders member avatars for a single role */
 function RoleMembersCell({ roleId }: { roleId: string }) {
   const { data: members, isLoading } = useRoleMembers(roleId);
   const MAX = 4;
@@ -143,19 +141,11 @@ export function RolesPage() {
 
   const rolesDataArr = roles ?? [];
 
-  // Notificar al hook de paginación cuando lleguen datos
-  const prevFetchingRef = useRef(isFetching);
+  // * Sincronizar el estado de la paginación con los datos cargados
   useEffect(() => {
-    if (prevFetchingRef.current && !isFetching) {
-      const count = rolesDataArr.length;
-      if (count === 0 && currentPage > 1) {
-        toast.warning("No hay más registros disponibles.", {
-          description: "Has llegado al final de la lista.",
-        });
-      }
-      handleDataLoaded(count);
+    if (!isFetching) {
+      handleDataLoaded(rolesDataArr.length);
     }
-    prevFetchingRef.current = isFetching;
   }, [isFetching, rolesDataArr.length, currentPage, handleDataLoaded]);
 
   const [modalOpen, setModalOpen] = useState(false);

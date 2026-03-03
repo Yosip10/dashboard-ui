@@ -20,7 +20,6 @@ export const useTokenRefresh = () => {
             const timeSinceLastRefresh = now - lastRefreshTime.current;
             const isOnCooldown = timeSinceLastRefresh < 30000;
 
-            console.log(`[TokenRefresh] Checking: ${secondsLeft}s left. Cooldown: ${isOnCooldown ? 'Active' : 'Expired'} (${Math.floor(timeSinceLastRefresh / 1000)}s since last)`);
 
             // Activar la actualización exactamente cuando quede 1 minuto (60 s) o menos
             if (secondsLeft <= 60 && secondsLeft > 0 && !isPending && !isOnCooldown) {

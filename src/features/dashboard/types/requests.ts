@@ -1,29 +1,33 @@
 export interface FlowRequest {
-    id: string;
-    createdAt: string;
-    docType: string;
+    code: number;
+    typeDocument: number;
     document: string;
-    key: string;
     url: string;
-    status: string;
+    key: string;
+    flowType: string;
+    state: number;
+    createFor: string;
+    updateFor: string;
+    valiteKey: string;
+    amountRisk: number;
+    customerId: number;
+    callBackUrl: string;
+    createDate: string;
+    project: number;
 }
 
-export interface ListRequestsPayload {
-    attributesToGet?: string;
-    search?: string;
-    column?: string;
-    filter?: string;
+export interface RequestPayload {
     limit?: number;
+    search?: string;
     skip?: number;
 }
 
 export interface ListRequestsResponse {
     success: boolean;
-    message: string | { error: string };
+    message: string;
     StatusCode: string;
-    data: {
-        requests: FlowRequest[];
-    };
+    data: FlowRequest[]
+    totalCount: number
 }
 
 export type RequestColumn = "id" | "document" | "status";

@@ -1,14 +1,5 @@
-
-import { useState } from "react";
-import {
-  Eye,
-  Copy,
-  ExternalLink,
-  Trash2,
-  Plus,
-  Check,
-
-} from "lucide-react";
+import { useState, useRef } from "react";
+import { Eye, Copy, ExternalLink, Plus, Check } from "lucide-react";
 import { CardContent, CardHeader, CardTitle } from "@/shared/ui/card";
 import { Button } from "@/shared/ui/button";
 import { Badge } from "@/shared/ui/badge";
@@ -20,60 +11,61 @@ import {
   TableHeader,
   TableRow,
 } from "@/shared/ui/table";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/shared/ui/tooltip";
-import { FlowRequestModal } from "../components/flow-request-modal";
-import { RequestDetailsModal } from "../components/request-details-modal";
-import DeleteRequestAlert from "../components/delete-request-alert";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/shared/ui/tooltip";
+import { RequestDetailsModal } from "../components/requests/request-details-modal";
+import DeleteRequestAlert from "../components/requests/delete-request-alert";
 import { PaginationControls } from "@/shared/components/pagination-controls";
 import { Loader2, X } from "lucide-react";
-import { MOCK_REQUESTS } from "../data/mock-request";
 import { useRequests } from "../hooks/use-requests";
 import { useSearch } from "@/shared/hooks";
+import { usePagination } from "@/shared/hooks/use-pagination";
+import type { FlowRequest } from "../types/requests";
+import { formatDate, getStatus } from "@/shared/utils";
+import { CreateRequestModal } from "../components/requests/create-request-modal";
 
 const statusStyles = {
-  activo: "bg-green-500/10 text-green-600 hover:bg-green-500/20",
-  pendiente: "bg-amber-500/10 text-amber-600 hover:bg-amber-500/20",
-  rechazado: "bg-red-500/10 text-red-600 hover:bg-red-500/20",
+  1: "bg-green-500/10 text-green-600 hover:bg-green-500/20",
+  2: "bg-amber-500/10 text-amber-600 hover:bg-amber-500/20",
+  3: "bg-red-500/10 text-red-600 hover:bg-red-500/20",
 };
 
 export function FlowRequestsPage() {
-  const [page, setPage] = useState(1);
-  const pageSize = 10;
-  const [isSimulatingLoading, setIsSimulatingLoading] = useState(false);
-  const { search, column } = useSearch();
+  const { search } = useSearch();
 
-  const { data: response, isLoading, isError } = useRequests({
-    limit: pageSize,
-    skip: (page - 1) * pageSize,
-    search,
-    column
-  }, true);
+  const {
+    currentPage,
+    pageSize,
+    visitedPages,
+    goToPage,
+    nextPage,
+    prevPage,
+    skip,
+    isAtEnd,
+  } = usePagination({ pageSize: 10 });
 
-  const requestsData = response?.data?.requests || [];
-  const totalPages = Math.ceil(MOCK_REQUESTS.length / pageSize);
-
-  const handlePageChange = (newPage: number) => {
-    if (newPage >= 1 && newPage <= totalPages) {
-      setIsSimulatingLoading(true);
-      setTimeout(() => {
-        setPage(newPage);
-        setIsSimulatingLoading(false);
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-      }, 800);
-    }
-  };
+  const {
+    data: response,
+    isLoading,
+    isError,
+  } = useRequests(
+    {
+      limit: pageSize,
+      skip,
+      search,
+    },
+    true,
+  );
 
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [detailsModalOpen, setDetailsModalOpen] = useState(false);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
-  const [selectedRequest, setSelectedRequest] = useState<(typeof MOCK_REQUESTS)[0] | null>(null);
+  const isFetching = useRef(false);
+  const [selectedRequest, setSelectedRequest] = useState<FlowRequest | null>(
+    null,
+  );
 
-  const handleViewDetails = (request: (typeof MOCK_REQUESTS)[0]) => {
+  const handleViewDetails = (request: FlowRequest) => {
     setSelectedRequest(request);
     setDetailsModalOpen(true);
   };
@@ -84,16 +76,32 @@ export function FlowRequestsPage() {
     setTimeout(() => setCopiedId(null), 2000);
   };
 
-  const handleDelete = (request: (typeof MOCK_REQUESTS)[0]) => {
-    setSelectedRequest(request);
-    setDeleteModalOpen(true);
+  const getDocument = (document: number) => {
+    switch (document) {
+      case 1:
+        return "Cedula";
+      case 2:
+        return "Tarjeta de indentidad";
+      case 11:
+        return "Cedula chilena";
+      case 17:
+        return "PTT";
+      case 4:
+        return "Cedula extranjera";
+      case 20:
+        return "Pasaporte";
+      default:
+        return "No asignado";
+    }
   };
 
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-64">
         <Loader2 className="w-8 h-8 animate-spin text-primary" />
-        <span className="ml-2 text-muted-foreground">Cargando solicitudes...</span>
+        <span className="ml-2 text-muted-foreground">
+          Cargando solicitudes...
+        </span>
       </div>
     );
   }
@@ -115,8 +123,12 @@ export function FlowRequestsPage() {
         request={selectedRequest}
       />
       <div className="space-y-6">
-        <FlowRequestModal open={modalOpen} onOpenChange={setModalOpen} />
-        <RequestDetailsModal open={detailsModalOpen} onOpenChange={setDetailsModalOpen} request={selectedRequest} />
+        <CreateRequestModal open={modalOpen} onOpenChange={setModalOpen} />
+        <RequestDetailsModal
+          open={detailsModalOpen}
+          onOpenChange={setDetailsModalOpen}
+          request={selectedRequest}
+        />
 
         <div className="flex items-center justify-between">
           <div>
@@ -138,7 +150,7 @@ export function FlowRequestsPage() {
 
         {/* Table */}
         <div className="overflow-hidden rounded-xs relative">
-          {isSimulatingLoading && (
+          {isFetching.current && (
             <div className="absolute inset-0 bg-background/50 backdrop-blur-[1px] z-10 flex items-center justify-center rounded-lg">
               <div className="bg-background p-4 rounded-full shadow-lg border border-primary/20">
                 <Loader2 className="w-8 h-8 animate-spin text-primary" />
@@ -167,68 +179,37 @@ export function FlowRequestsPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {requestsData.length ? requestsData.map((request, index) => (
-                  <TableRow
-                    key={request.id}
-                    className="hover:bg-primary/5 transition-colors duration-150 border-gray-200"
-                    style={{ animationDelay: `${index * 50}ms` }}
-                  >
-                    <TableCell className="font-mono text-sm text-muted-foreground pl-5">
-                      {request.id}
-                    </TableCell>
-                    <TableCell className="text-muted-foreground">
-                      {request.createdAt}
-                    </TableCell>
-                    <TableCell>
-                      <Badge
-                        variant="secondary"
-                        className="bg-primary/10 text-primary"
-                      >
-                        {request.docType}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="font-medium">
-                      {request.document}
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-2">
-                        <code className="text-xs bg-muted px-2 py-1 rounded font-mono">
-                          {request.key}
-                        </code>
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="h-7 w-7 hover:bg-primary/10 hover:text-primary"
-                              onClick={() =>
-                                copyToClipboard(
-                                  request.key,
-                                  `key-${request.id}`,
-                                )
-                              }
-                            >
-                              {copiedId === `key-${request.id}` ? (
-                                <Check className="w-3 h-3 text-primary" />
-                              ) : (
-                                <Copy className="w-3 h-3" />
-                              )}
-                            </Button>
-                          </TooltipTrigger>
-                          <TooltipContent>
-                            {copiedId === `key-${request.id}`
-                              ? "¡Copiado!"
-                              : "Copiar clave"}
-                          </TooltipContent>
-                        </Tooltip>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-2 max-w-50">
-                        <span className="truncate text-xs text-muted-foreground">
-                          {request.url}
-                        </span>
-                        <div className="flex items-center gap-1">
+                {response?.data?.length ? (
+                  response.data.map((request, index) => (
+                    <TableRow
+                      key={request.key}
+                      className="hover:bg-primary/5 transition-colors duration-150 border-gray-200"
+                      style={{ animationDelay: `${index * 50}ms` }}
+                    >
+                      <TableCell className="font-mono text-sm text-muted-foreground pl-5">
+                        {request.code}
+                      </TableCell>
+                      <TableCell className="text-muted-foreground">
+                        {formatDate(request.createDate)}
+                      </TableCell>
+                      <TableCell>
+                        <Badge
+                          variant="secondary"
+                          className="bg-primary/10 text-primary"
+                        >
+                          {getDocument(request.typeDocument)}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="font-medium">
+                        {request.document !== ""
+                          ? request.document
+                          : "Sin Documento"}
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-2">
+                          <code className="text-xs w-48 px-2 py-1 rounded font-mono">
+                            {request.key}
+                          </code>
                           <Tooltip>
                             <TooltipTrigger asChild>
                               <Button
@@ -237,12 +218,12 @@ export function FlowRequestsPage() {
                                 className="h-7 w-7 hover:bg-primary/10 hover:text-primary"
                                 onClick={() =>
                                   copyToClipboard(
-                                    request.url,
-                                    `url-${request.id}`,
+                                    request.key,
+                                    `key-${request.key}`,
                                   )
                                 }
                               >
-                                {copiedId === `url-${request.id}` ? (
+                                {copiedId === `key-${request.key}` ? (
                                   <Check className="w-3 h-3 text-primary" />
                                 ) : (
                                   <Copy className="w-3 h-3" />
@@ -250,64 +231,90 @@ export function FlowRequestsPage() {
                               </Button>
                             </TooltipTrigger>
                             <TooltipContent>
-                              {copiedId === `url-${request.id}`
+                              {copiedId === `key-${request.key}`
                                 ? "¡Copiado!"
-                                : "Copiar URL"}
+                                : "Copiar clave"}
                             </TooltipContent>
                           </Tooltip>
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                className="h-7 w-7 hover:bg-primary/10 hover:text-primary"
-                                onClick={() =>
-                                  window.open(request.url, "_blank")
-                                }
-                              >
-                                <ExternalLink className="w-3 h-3" />
-                              </Button>
-                            </TooltipTrigger>
-                            <TooltipContent>Abrir URL</TooltipContent>
-                          </Tooltip>
                         </div>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <Badge
-                        variant="secondary"
-                        className={
-                          statusStyles[
-                          request.status as keyof typeof statusStyles
-                          ]
-                        }
-                      >
-                        {request.status.charAt(0).toUpperCase() +
-                          request.status.slice(1)}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <div className="flex items-center justify-end gap-1">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-8 w-8 hover:bg-primary/10 hover:text-primary"
-                          onClick={() => handleViewDetails(request)}
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-2 max-w-50">
+                          <span className="truncate text-xs text-muted-foreground">
+                            {request.url}
+                          </span>
+                          <div className="flex items-center gap-1">
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="h-7 w-7 hover:bg-primary/10 hover:text-primary"
+                                  onClick={() =>
+                                    copyToClipboard(
+                                      request.url,
+                                      `url-${request.key}`,
+                                    )
+                                  }
+                                >
+                                  {copiedId === `url-${request.key}` ? (
+                                    <Check className="w-3 h-3 text-primary" />
+                                  ) : (
+                                    <Copy className="w-3 h-3" />
+                                  )}
+                                </Button>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                {copiedId === `url-${request.key}`
+                                  ? "¡Copiado!"
+                                  : "Copiar URL"}
+                              </TooltipContent>
+                            </Tooltip>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="h-7 w-7 hover:bg-primary/10 hover:text-primary"
+                                  onClick={() =>
+                                    window.open(request.url, "_blank")
+                                  }
+                                >
+                                  <ExternalLink className="w-3 h-3" />
+                                </Button>
+                              </TooltipTrigger>
+                              <TooltipContent>Abrir URL</TooltipContent>
+                            </Tooltip>
+                          </div>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <Badge
+                          variant="secondary"
+                          className={
+                            statusStyles[
+                              request.state as keyof typeof statusStyles
+                            ]
+                          }
                         >
-                          <Eye className="w-4 h-4" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-8 w-8 hover:bg-red-500/10 hover:text-red-600"
-                          onClick={() => handleDelete(request)}
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                )) : (
+                          {getStatus(request.state)}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <div className="flex items-center justify-end gap-1">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8 hover:bg-primary/10 hover:text-primary"
+                            onClick={() => handleViewDetails(request)}
+                          >
+                            <Eye className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                ) : (
                   <TableRow>
                     <TableCell colSpan={8} className="h-24 text-center">
                       No se encontraron solicitudes
@@ -318,15 +325,16 @@ export function FlowRequestsPage() {
             </Table>
           </CardContent>
           <PaginationControls
-            currentPage={page}
-            totalPages={totalPages}
-            totalItems={MOCK_REQUESTS.length}
-            itemsPerPage={pageSize}
-            onPageChange={handlePageChange}
+            currentPage={currentPage}
+            visitedPages={visitedPages}
+            onPageChange={goToPage}
+            onNext={nextPage}
+            onPrev={prevPage}
+            isLoading={isFetching.current}
+            isAtEnd={isAtEnd}
           />
         </div>
       </div>
     </div>
-
   );
 }

@@ -1,10 +1,10 @@
 import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { useAuthStore } from "@/features/login/store/auth.store";
-import type { ListRequestsPayload } from "../types/requests";
+import type { RequestPayload } from "../types/requests";
 import { getRequestsService } from "../services/get-requests.service";
 
-export const useRequests = (params: ListRequestsPayload, useMock = false) => {
+export const useRequests = (params: RequestPayload, useMock = false) => {
     const { user } = useAuthStore();
     const token = user?.access_token;
     const accountId = user?.["x-accountId"];
@@ -12,7 +12,7 @@ export const useRequests = (params: ListRequestsPayload, useMock = false) => {
     return useQuery({
         queryKey: ["requests", token, accountId, params, useMock],
         queryFn: async () => {
-            const { data, error } = await getRequestsService(accountId || "", params, useMock);
+            const { data, error } = await getRequestsService(params);
 
             if (error) {
                 toast.error(error.message);

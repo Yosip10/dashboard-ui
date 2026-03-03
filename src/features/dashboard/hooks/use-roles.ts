@@ -5,22 +5,21 @@ import type { ListRolesPayload } from "../types/roles";
 import { getRolesService } from "../services/get-roles.service";
 
 export const useRoles = (params: ListRolesPayload, useMock = false) => {
-    const { user } = useAuthStore();
-    const token = user?.access_token;
-    const accountId = user?.["x-accountId"];
+  const { user } = useAuthStore();
+  const token = user?.access_token;
+  const accountId = user?.["x-accountId"];
 
-    return useQuery({
-        queryKey: ["roles", token, accountId, params, useMock],
-        queryFn: async () => {
-            const { data, error } = await getRolesService();
-            console.log("data", data)
-            if (error) {
-                toast.error(error.message);
-                throw error;
-            }
+  return useQuery({
+    queryKey: ["roles", token, accountId, params, useMock],
+    queryFn: async () => {
+      const { data, error } = await getRolesService(params);
+      if (error) {
+        toast.error(error.message);
+        throw error;
+      }
 
-            return data;
-        },
-        enabled: !!token && !!accountId,
-    });
+      return data;
+    },
+    enabled: !!token && !!accountId,
+  });
 };
